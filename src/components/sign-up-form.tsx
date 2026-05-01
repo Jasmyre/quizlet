@@ -1,22 +1,33 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
+import { Eye, EyeOff } from "lucide-react";
 import type { JSX } from "react";
 import { useState, useTransition } from "react";
-import { useForm } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import type * as z from "zod";
 import { register } from "@/actions/register";
-import { FormError } from "@/components/form-error";
-import { FormSuccess } from "@/components/form-success";
+import { FormError, FormSuccess } from "@/components/form-notice";
 import { Button } from "@/components/ui/button";
-import { Form, FormField, FormItem, FormLabel } from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
+import {
+  Field,
+  FieldError,
+  FieldGroup,
+  FieldLabel,
+  FieldSet,
+} from "@/components/ui/field";
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupInput,
+} from "@/components/ui/input-group";
 import { registerSchema } from "@/schemas/auth-schema";
 
 export const SignupForm = (): JSX.Element => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const form = useForm<z.infer<typeof registerSchema>>({
     resolver: zodResolver(registerSchema),
@@ -40,69 +51,89 @@ export const SignupForm = (): JSX.Element => {
   };
 
   return (
-    <Form {...form}>
-      <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <Input
-                {...field}
-                className="mt-1"
-                id="name"
-                placeholder="Johnny Bravo"
-                type="text"
-              />
-            </FormItem>
-          )}
-        />
+    <form onSubmit={form.handleSubmit(onSubmit)}>
+      <FieldSet>
+        <FieldGroup>
+          <Controller
+            control={form.control}
+            name="name"
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel>Name:</FieldLabel>
+                <InputGroup>
+                  <InputGroupInput {...field} placeholder="Johnny Bravo" />
+                </InputGroup>
+                {fieldState.error && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Email</FormLabel>
-              <Input
-                {...field}
-                className="mt-1"
-                id="email"
-                placeholder="johndoe@example.com"
-                type="email"
-              />
-            </FormItem>
-          )}
-        />
+          <Controller
+            control={form.control}
+            name="email"
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel>Email:</FieldLabel>
+                <InputGroup>
+                  <InputGroupInput
+                    {...field}
+                    placeholder="johndoe@example.com"
+                    type="email"
+                  />
+                </InputGroup>
+                {fieldState.error && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
 
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Password</FormLabel>
-              <Input
-                {...field}
-                className="mt-1"
-                id="password"
-                placeholder="******"
-                type="password"
-              />
-            </FormItem>
-          )}
-        />
-        <FormError message={error} />
-        <FormSuccess message={success} />
-        <Button
-          className="w-full cursor-pointer"
-          disabled={isPending}
-          type="submit"
-          variant={"default"}
-        >
-          Sign Up
-        </Button>
-      </form>
-    </Form>
+          <Controller
+            control={form.control}
+            name="password"
+            render={({ field, fieldState }) => (
+              <Field>
+                <FieldLabel>Password:</FieldLabel>
+                <InputGroup>
+                  <InputGroupInput
+                    {...field}
+                    placeholder={showPassword ? "Your password" : "******"}
+                    type={showPassword ? "text" : "password"}
+                  />
+                  <InputGroupAddon align={"inline-end"}>
+                    <Button
+                      aria-label={
+                        showPassword ? "Hide password" : "Show password"
+                      }
+                      className="p-0"
+                      onClick={() => setShowPassword((previous) => !previous)}
+                      size={"icon"}
+                      title={showPassword ? "Hide password" : "Show password"}
+                      type="button"
+                      variant={"ghost"}
+                    >
+                      {showPassword ? <Eye /> : <EyeOff />}
+                    </Button>
+                  </InputGroupAddon>
+                </InputGroup>
+                {fieldState.error && <FieldError errors={[fieldState.error]} />}
+              </Field>
+            )}
+          />
+
+          <FormError message={error} />
+          <FormSuccess message={success} />
+
+          <Field>
+            <Button
+              className="w-full cursor-pointer"
+              disabled={isPending}
+              type="submit"
+              variant={"default"}
+            >
+              Sign Up
+            </Button>
+          </Field>
+        </FieldGroup>
+      </FieldSet>
+    </form>
   );
 };

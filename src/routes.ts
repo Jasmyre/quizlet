@@ -1,6 +1,7 @@
 export const publicRoutes = [
   "/",
   "/maintenance",
+  "/landing"
 ];
 
 export const authRoutes = ["/auth", "/auth/error", "/api/auth/callback/google", "/api/auth/callback/github"];

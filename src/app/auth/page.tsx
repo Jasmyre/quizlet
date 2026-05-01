@@ -1,6 +1,6 @@
 import { FaGithub, FaGoogle } from "react-icons/fa";
 import { AuthProviderButton } from "@/components/auth-provider-button";
-import { LogInForm } from "@/components/login-form";
+import { SignInForm } from "@/components/sign-in-form";
 import { SignupForm } from "@/components/sign-up-form";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
@@ -36,7 +36,7 @@ export default function AuthPage() {
                 </ButtonGroup>
               </TabsList>
               <TabsContent value="signin">
-                <LogInForm />
+                <SignInForm />
                 <Button className="mt-2 cursor-pointer p-0" variant="link">
                   Forgot password?
                 </Button>

@@ -68,6 +68,7 @@ export const SignInForm = () => {
                 <InputGroup>
                   <InputGroupInput
                     {...field}
+                    disabled={isPending}
                     placeholder="Johnny Bravo"
                     type="email"
                   />
@@ -85,6 +86,7 @@ export const SignInForm = () => {
                 <InputGroup>
                   <InputGroupInput
                     {...field}
+                    disabled={isPending}
                     placeholder={showPassword ? "Your password" : "******"}
                     type={showPassword ? "text" : "password"}
                   />
@@ -94,6 +96,7 @@ export const SignInForm = () => {
                         showPassword ? "Hide password" : "Show password"
                       }
                       className="p-0"
+                      disabled={isPending}
                       onClick={() => setShowPassword((previous) => !previous)}
                       size={"icon"}
                       title={showPassword ? "Hide password" : "Show password"}
@@ -126,54 +129,4 @@ export const SignInForm = () => {
       </FieldSet>
     </form>
   );
-
-  // return (
-  //   <Form {...form}>
-  //     <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
-  //       <FormField
-  //         control={form.control}
-  //         name="email"
-  //         render={({ field }) => (
-  //           <FormItem>
-  //             <FormLabel>Email</FormLabel>
-  //             <Input
-  //               {...field}
-  //               className="mt-1"
-  //               id="email"
-  //               placeholder="johndoe@example.com"
-  //               type="email"
-  //             />
-  //           </FormItem>
-  //         )}
-  //       />
-
-  //       <FormField
-  //         control={form.control}
-  //         name="password"
-  //         render={({ field }) => (
-  //           <FormItem>
-  //             <FormLabel>Password</FormLabel>
-  //             <Input
-  //               {...field}
-  //               className="mt-1"
-  //               id="password"
-  //               placeholder="******"
-  //               type="password"
-  //             />
-  //           </FormItem>
-  //         )}
-  //       />
-  //       <FormError message={error ?? urlError} />
-  //       <FormSuccess message={success} />
-  //       <Button
-  //         className="w-full cursor-pointer"
-  //         disabled={isPending}
-  //         type="submit"
-  //         variant={"default"}
-  //       >
-  //         Sign In
-  //       </Button>
-  //     </form>
-  //   </Form>
-  // );
 };

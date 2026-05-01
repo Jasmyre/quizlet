@@ -61,7 +61,11 @@ export const SignupForm = (): JSX.Element => {
               <Field>
                 <FieldLabel>Name:</FieldLabel>
                 <InputGroup>
-                  <InputGroupInput {...field} placeholder="Johnny Bravo" />
+                  <InputGroupInput
+                    {...field}
+                    disabled={isPending}
+                    placeholder="Johnny Bravo"
+                  />
                 </InputGroup>
                 {fieldState.error && <FieldError errors={[fieldState.error]} />}
               </Field>
@@ -77,6 +81,7 @@ export const SignupForm = (): JSX.Element => {
                 <InputGroup>
                   <InputGroupInput
                     {...field}
+                    disabled={isPending}
                     placeholder="johndoe@example.com"
                     type="email"
                   />
@@ -95,6 +100,7 @@ export const SignupForm = (): JSX.Element => {
                 <InputGroup>
                   <InputGroupInput
                     {...field}
+                    disabled={isPending}
                     placeholder={showPassword ? "Your password" : "******"}
                     type={showPassword ? "text" : "password"}
                   />
@@ -104,6 +110,7 @@ export const SignupForm = (): JSX.Element => {
                         showPassword ? "Hide password" : "Show password"
                       }
                       className="p-0"
+                      disabled={isPending}
                       onClick={() => setShowPassword((previous) => !previous)}
                       size={"icon"}
                       title={showPassword ? "Hide password" : "Show password"}

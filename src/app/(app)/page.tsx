@@ -1,5 +1,5 @@
 import { HydrateClient } from "@/trpc/server";
-import { ModeToggle } from "../components/mode-toggle";
+import { ModeToggle } from "../../components/mode-toggle";
 
 export default async function Home() {
   return (

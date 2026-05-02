@@ -8,7 +8,6 @@ import {
   Gauge,
   Layers3,
   Link2,
-  QrCode,
   Share2,
   Smartphone,
   Sparkles,
@@ -117,9 +116,9 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
   const Icon = feature.icon;
 
   return (
-    <Card className="rounded-2xl border border-border/70 bg-card/95 shadow-sm">
+    <Card className="rounded-2xl border-none bg-linear-to-br from-white via-blue-50/50 to-blue-100/40 shadow-sm ring-1 ring-black/5 dark:from-card dark:via-card dark:to-blue-950/30 dark:ring-none">
       <CardContent className="space-y-3 p-5 text-center">
-        <div className="mx-auto inline-flex rounded-xl border border-primary/15 bg-primary/5 p-2.5 text-primary">
+        <div className="mx-auto inline-flex rounded-xl bg-white/80 p-2.5 text-primary ring-1 ring-black/5 dark:bg-white/10 dark:ring-white/15">
           <Icon className="h-5 w-5" />
         </div>
         <h3 className="font-semibold text-base text-foreground">
@@ -140,7 +139,9 @@ const TrustBadge = ({ label }: { label: string }) => (
 
 const StatItem = ({ label, value }: { label: string; value: string }) => (
   <div className="space-y-1">
-    <p className="font-semibold text-3xl text-white tracking-tight">{value}</p>
+    <p className="font-semibold text-3xl text-primary tracking-tight">
+      {value}
+    </p>
     <p className="text-blue-100/80 text-sm">{label}</p>
   </div>
 );
@@ -148,11 +149,11 @@ const StatItem = ({ label, value }: { label: string; value: string }) => (
 const StepItem = ({ step }: { step: Step }) => {
   const Icon = step.icon;
   return (
-    <div className="relative flex flex-col items-center text-center">
+    <div className="relative mx-2 flex flex-1 flex-row items-start gap-4 text-center md:flex-col md:items-center">
       <div className="z-10 mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full border border-primary/20 bg-blue-100 font-semibold text-primary text-xs dark:bg-blue-100">
         {step.step}
       </div>
-      <div className="w-full max-w-44 rounded-2xl border border-border/70 bg-card px-4 py-4 shadow-xs">
+      <div className="h-full w-full rounded-2xl border-none bg-linear-to-br from-white via-blue-50/50 to-blue-100/40 px-4 py-4 shadow-sm ring-1 ring-black/5 sm:max-w-64 dark:from-card dark:via-card dark:to-blue-950/30 dark:ring-none">
         <div className="mx-auto mb-2 inline-flex rounded-lg bg-muted p-2 text-primary">
           <Icon className="h-4 w-4" />
         </div>
@@ -166,12 +167,12 @@ const StepItem = ({ step }: { step: Step }) => {
 };
 
 const StepConnector = () => (
-  <div className="pointer-events-none absolute top-4 right-0 left-1/2 hidden border-blue-200 border-t border-dashed sm:block" />
+  <div className="pointer-events-none absolute top-4 right-0 left-1/2 hidden w-full -translate-x-1/2 border-blue-200 border-t border-dashed sm:block" />
 );
 
-const StepItemWrap = ({ isLast, step }: { isLast: boolean; step: Step }) => (
-  <div className="relative">
-    {isLast ? null : <StepConnector />}
+const StepItemWrap = ({ step }: { step: Step }) => (
+  <div className="relative flex">
+    <StepConnector />
     <StepItem step={step} />
   </div>
 );
@@ -188,13 +189,13 @@ const InstallHintItem = ({ hint, index }: { hint: string; index: number }) => (
 export default function LandingPage() {
   return (
     <main className="bg-linear-to-b from-background via-muted/25 to-background px-4 py-5 md:px-6">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 rounded-3xl border border-border/60 bg-background/80 p-3 shadow-lg backdrop-blur-sm md:p-5">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-20 rounded-3xl border-border/60 border-none p-0 md:border md:bg-background/80 md:p-5 md:shadow-lg md:backdrop-blur-sm">
         <section className="light relative overflow-hidden rounded-3xl border border-blue-200 bg-linear-to-br from-blue-100 via-white to-blue-200/60 p-5 text-slate-900 shadow-sm md:p-8">
           <div className="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-blue-300/40 blur-3xl" />
           <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-blue-200/35 blur-3xl" />
           <div className="absolute inset-0 bg-white/30" />
 
-          <div className="relative grid gap-7 md:grid-cols-[1.05fr_0.95fr] md:items-center">
+          <div className="relative grid min-h-[50vh] gap-7 md:grid-cols-[1.05fr_0.95fr] md:items-center">
             <div className="space-y-5">
               <p className="inline-flex items-center gap-2 rounded-full border border-blue-300 bg-white/90 px-3 py-1 text-blue-700 text-xs">
                 <Smartphone className="h-3.5 w-3.5" />
@@ -213,7 +214,7 @@ export default function LandingPage() {
                 </p>
               </div>
               <div className="flex flex-wrap gap-3">
-                <Button asChild className="h-10 rounded-x" size="lg">
+                <Button asChild className="h-10 flex-1 rounded-x" size="lg">
                   <Link href="#">
                     <ArrowDownToLine className="h-4 w-4" />
                     Install App (PWA)
@@ -221,7 +222,7 @@ export default function LandingPage() {
                 </Button>
                 <Button
                   asChild
-                  className="h-10 rounded-xl border border-blue-200 bg-white px-5 text-slate-800 shadow-xs hover:bg-blue-50"
+                  className="h-10 flex-1 rounded-xl border border-blue-200 bg-white px-5 text-slate-800 shadow-xs hover:bg-blue-50"
                   size="lg"
                   variant="outline"
                 >
@@ -304,13 +305,9 @@ export default function LandingPage() {
               How it works
             </h2>
           </div>
-          <div className="grid gap-4 sm:grid-cols-5">
-            {STEPS.map((step, index) => (
-              <StepItemWrap
-                isLast={index === STEPS.length - 1}
-                key={step.step}
-                step={step}
-              />
+          <div className="grid gap-4 sm:grid-cols-5 md:gap-0.5">
+            {STEPS.map((step) => (
+              <StepItemWrap key={step.step} step={step} />
             ))}
           </div>
         </section>
@@ -344,7 +341,7 @@ export default function LandingPage() {
               <div className="flex flex-wrap items-center gap-3">
                 <Button
                   asChild
-                  className="h-10 rounded-xl bg-white px-5 font-semibold text-blue-700 hover:bg-blue-50"
+                  className="h-10 flex-1 rounded-xl bg-white px-5 font-semibold text-blue-700 hover:light:bg-gray-100 hover:dark:bg-gray-100"
                   size="lg"
                 >
                   <Link href="#">
@@ -352,10 +349,6 @@ export default function LandingPage() {
                     Install Now
                   </Link>
                 </Button>
-                <div className="inline-flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-3 py-2 text-blue-50 text-sm">
-                  <QrCode className="h-4 w-4" />
-                  Scan for install guide
-                </div>
               </div>
             </div>
             <div className="grid gap-3 self-end">

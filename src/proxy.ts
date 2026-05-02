@@ -41,6 +41,12 @@ export default auth((req) => {
     return;
   }
 
+  // Redirect unauthenticated users to the landing page when they try to access the home page with no authentication
+  if (!isLoggedIn && nextUrl.pathname === "/") {
+    return Response.redirect(new URL("/landing", nextUrl));
+  }
+
+  // Redirect unauthenticated users to the login page when they try to access protected routes
   if (!(isLoggedIn || isPublicRoute)) {
     return Response.redirect(new URL("/auth", nextUrl), 302);
   }

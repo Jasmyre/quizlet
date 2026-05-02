@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import FooterSection, { type Links } from "@/components/footer";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -189,7 +190,7 @@ const InstallHintItem = ({ hint, index }: { hint: string; index: number }) => (
 export default function LandingPage() {
   return (
     <main className="bg-linear-to-b from-background via-muted/25 to-background px-4 py-5 md:px-6">
-      <div className="mx-auto flex w-full max-w-7xl flex-col gap-20 rounded-3xl border-border/60 border-none p-0 md:border md:bg-background/80 md:p-5 md:shadow-lg md:backdrop-blur-sm">
+      <div className="mx-auto flex w-full max-w-7xl flex-col gap-20 rounded-3xl md:p-5">
         <section className="light relative overflow-hidden rounded-3xl border border-blue-200 bg-linear-to-br from-blue-100 via-white to-blue-200/60 p-5 text-slate-900 shadow-sm md:p-8">
           <div className="absolute -top-24 -right-24 h-56 w-56 rounded-full bg-blue-300/40 blur-3xl" />
           <div className="absolute -bottom-24 -left-16 h-56 w-56 rounded-full bg-blue-200/35 blur-3xl" />
@@ -368,6 +369,49 @@ export default function LandingPage() {
           </div>
         </section>
       </div>
+      <FooterSection links={footerLinks} />
     </main>
   );
 }
+
+const footerLinks: Links[] = [
+  {
+    group: "Product",
+    items: [
+      { title: "Features", href: "#features", target: "_self" },
+      { title: "How It Works", href: "#how-it-works", target: "_self" },
+      { title: "Install App", href: "#install", target: "_self" },
+      { title: "Explore Reviewers", href: "/explore", target: "_self" },
+    ],
+  },
+
+  {
+    group: "Platform",
+    items: [
+      { title: "Create Reviewer", href: "/create", target: "_self" },
+      { title: "Flashcards", href: "/flashcards", target: "_self" },
+      { title: "Quiz Mode", href: "/quiz", target: "_self" },
+      { title: "Leaderboard", href: "/leaderboard", target: "_self" },
+    ],
+  },
+
+  {
+    group: "Resources",
+    items: [
+      { title: "Help Center", href: "/help", target: "_self" },
+      { title: "Community", href: "/community", target: "_self" },
+      { title: "Donate", href: "/donate", target: "_self" },
+      { title: "Contact", href: "/contact", target: "_self" },
+    ],
+  },
+
+  {
+    group: "Legal",
+    items: [
+      { title: "Privacy Policy", href: "/privacy", target: "_self" },
+      { title: "Terms of Service", href: "/terms", target: "_self" },
+      { title: "Cookie Policy", href: "/cookies", target: "_self" },
+      { title: "Sitemap", href: "/sitemap.xml", target: "_blank" },
+    ],
+  },
+];

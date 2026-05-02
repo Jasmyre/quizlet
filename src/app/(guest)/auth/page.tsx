@@ -19,9 +19,9 @@ export default function AuthPage() {
     <div className="flex min-h-[80vh] items-center justify-center max-sm:px-4">
       <Card className="w-full max-w-md">
         <CardHeader>
-          <CardTitle className="font-bold text-4xl">ICTQuest</CardTitle>
+          <CardTitle className="font-bold text-4xl">Quizlet</CardTitle>
           <CardDescription className="text-muted-foreground">
-            Your ultimate platform for ICT learning and growth
+            Sign in to your account or create a new one
           </CardDescription>
           <CardContent className="mt-6 px-0">
             <Tabs className="w-full" defaultValue="signin">

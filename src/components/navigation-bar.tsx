@@ -258,7 +258,8 @@ export function NavigationBar({
                     alt="Website logo"
                     className="h-8 w-8 rounded-full"
                     height={100}
-                    src={"/logo.svg"}
+                    priority
+                    src={"/assets/logo.png"}
                     width={100}
                   />
                   {title}
@@ -666,7 +667,7 @@ function MobileSidebar({
               alt="Website logo"
               className="h-4 w-4 rounded-full"
               height={100}
-              src={"/logo.svg"}
+              src={"/assets/logo.png"}
               width={100}
             />
           </div>

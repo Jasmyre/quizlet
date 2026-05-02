@@ -96,7 +96,7 @@ export default function RootLayout({
               enableBlock
               navItems={navItems}
               pageItems={pageItems}
-              title="Template"
+              title="Quizlet"
             />
             {children}
           </ThemeProvider>

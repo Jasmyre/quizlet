@@ -97,7 +97,7 @@ export default function RootLayout({
               enableCrumbs={false}
               navItems={navItems}
               pageItems={pageItems}
-              title="Template"
+              title="Quizlet"
             />
             {children}
           </ThemeProvider>

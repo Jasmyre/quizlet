@@ -83,6 +83,7 @@ export interface NavItem {
 
 interface AdaptiveNavProps {
   enableBlock?: boolean;
+  enableCrumbs?: boolean;
   navItems: NavItem[];
   pageItems?: NavItem[];
   title?: string;
@@ -93,6 +94,7 @@ export function NavigationBar({
   pageItems,
   title = "Logo",
   enableBlock = true,
+  enableCrumbs = true,
 }: AdaptiveNavProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -402,7 +404,7 @@ export function NavigationBar({
       </header>
 
       {/* Breadcrumbs - Desktop */}
-      {pathname !== "/" && (
+      {enableCrumbs && pathname !== "/" && (
         <div
           className={`fixed bg-background ${isVisible ? "top-14" : "top-10"} right-0 left-0 z-40 border-muted border-b transition-transform duration-300 ease-in-out dark:border-muted ${
             isVisible ? "translate-y-0" : "-translate-y-full"
@@ -527,7 +529,7 @@ export function NavigationBar({
         </div>
 
         {/* Mobile Breadcrumbs */}
-        {pathname !== "/" && (
+        {enableCrumbs && pathname !== "/" && (
           <div className="border-muted border-t border-b bg-background px-4 py-2 dark:border-muted">
             <Breadcrumb>
               <BreadcrumbList>
@@ -592,7 +594,9 @@ export function NavigationBar({
 
       {/* Spacer for fixed header */}
       {enableBlock ? (
-        <div className={`${pathname === "/" ? "h-14" : "h-24 lg:h-24"}`} />
+        <div
+          className={`${pathname === "/" || !enableCrumbs ? "h-14" : "h-24 lg:h-24"}`}
+        />
       ) : null}
     </>
   );

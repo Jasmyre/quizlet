@@ -22,15 +22,59 @@ const GOOGLE_SITE_VERIFICATION =
   env.GOOGLE_SITE_VERIFICATION ??
   "err:Environment_'GOOGLE_SITE_VERIFICATION'_Variable_Is_Not_Defined";
 
-const SITE_NAME = "Template";
-const DEFAULT_TITLE = `${SITE_NAME} | Next.js 16`;
-const DEFAULT_DESCRIPTION = "A modern Next.js 16 starter template.";
+const SITE_NAME = "Quizlet";
+const DEFAULT_TITLE = `Jazmyre | ${SITE_NAME}`;
+const DEFAULT_DESCRIPTION =
+  "Create and share flashcards with ease using Quizlet, the ultimate study tool.";
 const DEFAULT_OG_IMAGE = "/thumbnail.png";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   applicationName: SITE_NAME,
-  keywords: ["nextjs", "template", "typescript", "t3", "starter"],
+  keywords: [
+    "quizlet",
+    "quizlet alternative",
+    "quizlet clone",
+    "quizlet app",
+    "quizlet flashcards",
+    "jazmyre quizlet",
+    "jazmyre learning platform",
+    "jazmyre flashcards",
+    "jazmyre study app",
+    "jazmyre quiz app",
+    "jazmyre reviewer app",
+    "online flashcards",
+    "study flashcards",
+    "flashcard app",
+    "study app for students",
+    "online quiz platform",
+    "quiz maker online",
+    "exam reviewer app",
+    "learning platform",
+    "study tools online",
+    "ai flashcard generator",
+    "create flashcards online",
+    "multiple choice quiz maker",
+    "spaced repetition app",
+    "practice test generator",
+    "interactive learning platform",
+    "student productivity app",
+    "exam preparation app",
+    "best app for studying exams",
+    "online reviewer for quizzes",
+    "free online flashcard maker",
+    "best quizlet alternative",
+    "ai quiz generator",
+    "ai study assistant",
+    "generate flashcards from notes",
+    "online reviewer app for students",
+    "study smarter app",
+    "memorization app",
+    "self review platform",
+    "student learning tools",
+    "digital flashcards",
+    "smart study platform",
+  ],
   title: {
     default: DEFAULT_TITLE,
     template: `%s | ${SITE_NAME}`,

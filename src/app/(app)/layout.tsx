@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
 import { TRPCReactProvider } from "@/trpc/react";
+import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -131,20 +132,23 @@ export default function RootLayout({
     >
       <body className="bg-background">
         <TRPCReactProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            disableTransitionOnChange
-            enableSystem
-          >
-            <NavigationBar
-              enableBlock
-              navItems={navItems}
-              pageItems={pageItems}
-              title="Quizlet"
-            />
-            {children}
-          </ThemeProvider>
+          <SessionProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              disableTransitionOnChange
+              enableSystem
+            >
+              <NavigationBar
+                enableBlock
+                enableCrumbs={false}
+                navItems={navItems}
+                pageItems={pageItems}
+                title="Quizlet"
+              />
+              {children}
+            </ThemeProvider>
+          </SessionProvider>
         </TRPCReactProvider>
         <Analytics />
       </body>

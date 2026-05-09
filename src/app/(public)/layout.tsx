@@ -3,6 +3,7 @@ import "@/styles/globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Inter } from "next/font/google";
+import { SessionProvider } from "next-auth/react";
 import { type NavItem, NavigationBar } from "@/components/navigation-bar";
 import { ThemeProvider } from "@/components/theme-provider";
 import { env } from "@/env";
@@ -131,21 +132,23 @@ export default function RootLayout({
     >
       <body className="bg-background">
         <TRPCReactProvider>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            disableTransitionOnChange
-            enableSystem
-          >
-            <NavigationBar
-              enableBlock
-              enableCrumbs={false}
-              navItems={navItems}
-              pageItems={pageItems}
-              title="Quizlet"
-            />
-            {children}
-          </ThemeProvider>
+          <SessionProvider>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="system"
+              disableTransitionOnChange
+              enableSystem
+            >
+              <NavigationBar
+                enableBlock
+                enableCrumbs={false}
+                navItems={navItems}
+                pageItems={pageItems}
+                title="Quizlet"
+              />
+              {children}
+            </ThemeProvider>
+          </SessionProvider>
         </TRPCReactProvider>
         <Analytics />
       </body>

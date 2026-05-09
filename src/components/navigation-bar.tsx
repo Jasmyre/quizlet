@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/complexity/noExcessiveCognitiveComplexity: refactor later */
 "use client";
 
 import { VisuallyHidden } from "@radix-ui/react-visually-hidden";
@@ -16,9 +17,11 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useSession } from "next-auth/react";
 import { useTheme } from "next-themes";
 import type { ReactNode } from "react";
 import React, { useEffect, useState } from "react";
+import { signout } from "@/actions/sign-out";
 import {
   Breadcrumb,
   BreadcrumbEllipsis,
@@ -89,6 +92,10 @@ interface AdaptiveNavProps {
   title?: string;
 }
 
+const handleSignout = async () => {
+  await signout();
+};
+
 export function NavigationBar({
   navItems,
   pageItems,
@@ -154,6 +161,9 @@ export function NavigationBar({
   const toggleTheme = () => {
     setTheme(theme === "dark" ? "light" : "dark");
   };
+
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated" && Boolean(session);
 
   return (
     <>
@@ -368,37 +378,53 @@ export function NavigationBar({
                 <span className="sr-only">Toggle theme</span>
               </Button>
 
-              {/* User Menu */}
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    aria-label="User menu"
-                    className="cursor-pointer opacity-70 transition-all duration-200 hover:opacity-100"
-                    size="icon"
-                    variant="ghost"
+              {/* user menu will not be displayed without session but will be a cta signin instead */}
+              {!isAuthenticated && (
+                <Button asChild>
+                  <Link className="ml-2" href={"/auth"}>
+                    Sign in
+                  </Link>
+                </Button>
+              )}
+
+              {isAuthenticated && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button
+                      aria-label="User menu"
+                      className="cursor-pointer opacity-70 transition-all duration-200 hover:opacity-100"
+                      size="icon"
+                      variant="ghost"
+                    >
+                      <User className="h-4 w-4 transition-transform duration-200" />
+                      <span className="sr-only">User menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent
+                    align="end"
+                    className="w-56 dark:bg-card"
                   >
-                    <User className="h-4 w-4 transition-transform duration-200" />
-                    <span className="sr-only">User menu</span>
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56 dark:bg-card">
-                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer opacity-80 transition-all duration-200 hover:opacity-100">
-                    <User className="mr-2 h-4 w-4 transition-transform duration-200" />
-                    <span>Profile</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem className="cursor-pointer opacity-80 transition-all duration-200 hover:opacity-100">
-                    <Settings className="mr-2 h-4 w-4 transition-transform duration-200" />
-                    <span>Settings</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem className="cursor-pointer opacity-80 transition-all duration-200 hover:opacity-100">
-                    <LogOut className="mr-2 h-4 w-4 transition-transform duration-200" />
-                    <span>Log out</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem className="cursor-pointer opacity-80 transition-all duration-200 hover:opacity-100">
+                      <User className="mr-2 h-4 w-4 transition-transform duration-200" />
+                      <span>Profile</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="cursor-pointer opacity-80 transition-all duration-200 hover:opacity-100">
+                      <Settings className="mr-2 h-4 w-4 transition-transform duration-200" />
+                      <span>Settings</span>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem
+                      className="cursor-pointer opacity-80 transition-all duration-200 hover:opacity-100"
+                      onClick={() => handleSignout()}
+                    >
+                      <LogOut className="mr-2 h-4 w-4 transition-transform duration-200" />
+                      <span>Log out</span>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
             </div>
           </div>
         </div>
@@ -656,6 +682,9 @@ function MobileSidebar({
     setTheme(theme === "dark" ? "light" : "dark");
   };
 
+  const { data: session, status } = useSession();
+  const isAuthenticated = status === "authenticated" && Boolean(session);
+
   return (
     <div className="flex h-full w-full flex-col bg-background">
       {/* Sidebar Header */}
@@ -740,62 +769,80 @@ function MobileSidebar({
         </div>
       </div>
 
+      {/*sidebar footer only show if no session, else will be a signin cta */}
+      {!isAuthenticated && (
+        <div className="p-3">
+          <Button
+            aria-label="Sign in"
+            asChild
+            className="w-full"
+            variant="outline"
+          >
+            <Link href="/signin" onClick={onNavigate}>
+              Sign in
+            </Link>
+          </Button>
+        </div>
+      )}
+
       {/* Sidebar Footer */}
-      <div className="border-sidebar-border border-t p-3">
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              aria-label="User account menu"
-              className="h-10 w-full cursor-pointer justify-start px-3 opacity-90 transition-all duration-200 hover:opacity-100"
-              variant="ghost"
-            >
-              <div className="flex flex-1 items-center gap-2">
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs transition-all duration-200">
-                  JD
+      {isAuthenticated && (
+        <div className="border-sidebar-border border-t p-3">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                aria-label="User account menu"
+                className="h-10 w-full cursor-pointer justify-start px-3 opacity-90 transition-all duration-200 hover:opacity-100"
+                variant="ghost"
+              >
+                <div className="flex flex-1 items-center gap-2">
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-primary-foreground text-xs transition-all duration-200">
+                    JD
+                  </div>
+                  <div className="grid flex-1 text-left text-sm leading-tight">
+                    <span className="truncate font-medium">John Doe</span>
+                    <span className="truncate text-sidebar-foreground/70 text-xs">
+                      Account
+                    </span>
+                  </div>
                 </div>
-                <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">John Doe</span>
-                  <span className="truncate text-sidebar-foreground/70 text-xs">
-                    Account
-                  </span>
-                </div>
-              </div>
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="start" className="w-56" side="top">
-            <DropdownMenuLabel className="relative pl-8">
-              <div className="absolute top-0 bottom-0 left-2 w-px bg-sidebar-border" />
-              My Account
-            </DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="relative cursor-pointer pl-8 opacity-80 transition-all duration-200 hover:opacity-100"
-              onClick={onNavigate}
-            >
-              <div className="absolute top-0 bottom-0 left-2 w-px bg-sidebar-border" />
-              <User className="mr-2 h-4 w-4 transition-transform duration-200" />
-              <span>Profile</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              className="relative cursor-pointer pl-8 opacity-80 transition-all duration-200 hover:opacity-100"
-              onClick={onNavigate}
-            >
-              <div className="absolute top-0 bottom-0 left-2 w-px bg-sidebar-border" />
-              <Settings className="mr-2 h-4 w-4 transition-transform duration-200" />
-              <span>Settings</span>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="relative cursor-pointer pl-8 opacity-80 transition-all duration-200 hover:opacity-100"
-              onClick={onNavigate}
-            >
-              <div className="absolute top-0 bottom-0 left-2 w-px bg-sidebar-border" />
-              <LogOut className="mr-2 h-4 w-4 transition-transform duration-200" />
-              <span>Log out</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-56" side="top">
+              <DropdownMenuLabel className="relative pl-8">
+                <div className="absolute top-0 bottom-0 left-2 w-px bg-sidebar-border" />
+                My Account
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="relative cursor-pointer pl-8 opacity-80 transition-all duration-200 hover:opacity-100"
+                onClick={onNavigate}
+              >
+                <div className="absolute top-0 bottom-0 left-2 w-px bg-sidebar-border" />
+                <User className="mr-2 h-4 w-4 transition-transform duration-200" />
+                <span>Profile</span>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="relative cursor-pointer pl-8 opacity-80 transition-all duration-200 hover:opacity-100"
+                onClick={onNavigate}
+              >
+                <div className="absolute top-0 bottom-0 left-2 w-px bg-sidebar-border" />
+                <Settings className="mr-2 h-4 w-4 transition-transform duration-200" />
+                <span>Settings</span>
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="relative cursor-pointer pl-8 opacity-80 transition-all duration-200 hover:opacity-100"
+                onClick={() => handleSignout()}
+              >
+                <div className="absolute top-0 bottom-0 left-2 w-px bg-sidebar-border" />
+                <LogOut className="mr-2 h-4 w-4 transition-transform duration-200" />
+                <span>Log out</span>
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
     </div>
   );
 }

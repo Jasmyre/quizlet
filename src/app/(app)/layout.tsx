@@ -3,12 +3,12 @@ import "@/styles/globals.css";
 import { Analytics } from "@vercel/analytics/next";
 import type { Metadata } from "next";
 import { Geist, Inter } from "next/font/google";
-import { type NavItem, NavigationBar } from "@/components/navigation-bar";
+import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/components/theme-provider";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { env } from "@/env";
 import { cn } from "@/lib/utils";
 import { TRPCReactProvider } from "@/trpc/react";
-import { SessionProvider } from "next-auth/react";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -139,14 +139,16 @@ export default function RootLayout({
               disableTransitionOnChange
               enableSystem
             >
-              <NavigationBar
-                enableBlock
-                enableCrumbs={false}
-                navItems={navItems}
-                pageItems={pageItems}
-                title="Quizlet"
-              />
-              {children}
+              <TooltipProvider>
+                {/* <NavigationBar
+                  enableBlock
+                  enableCrumbs={false}
+                  navItems={navItems}
+                  pageItems={pageItems}
+                  title="Quizlet"
+                /> */}
+                {children}
+              </TooltipProvider>
             </ThemeProvider>
           </SessionProvider>
         </TRPCReactProvider>
@@ -155,33 +157,3 @@ export default function RootLayout({
     </html>
   );
 }
-
-const navItems: NavItem[] = [
-  {
-    name: "Home",
-    href: "/",
-  },
-  {
-    name: "Maintenance",
-    href: "/maintenance",
-  },
-  {
-    name: "Dashboard",
-    href: "/dashboard",
-  },
-];
-
-const pageItems: NavItem[] = [
-  {
-    name: "Home",
-    href: "/",
-  },
-  {
-    name: "Maintenance",
-    href: "/maintenance",
-  },
-  {
-    name: "Dashboard",
-    href: "/dashboard",
-  },
-];

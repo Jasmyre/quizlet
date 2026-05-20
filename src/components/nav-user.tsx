@@ -1,13 +1,12 @@
 "use client";
 
 import {
-  BadgeCheckIcon,
   BellIcon,
   ChevronsUpDownIcon,
-  CreditCardIcon,
   LogOutIcon,
-  SparklesIcon,
+  SettingsIcon,
 } from "lucide-react";
+import { signout } from "@/actions/sign-out";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -34,6 +33,10 @@ export interface NavUserData {
 export function NavUser({ user }: { user: NavUserData }) {
   const { isMobile } = useSidebar();
 
+  const handleSignout = async () => {
+    await signout();
+  };
+
   return (
     <SidebarMenu>
       <SidebarMenuItem>
@@ -49,7 +52,9 @@ export function NavUser({ user }: { user: NavUserData }) {
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.name}</span>
-                <span className="truncate text-xs">{user.email}</span>
+                <span className="truncate text-muted-foreground text-xs">
+                  {user.email}
+                </span>
               </div>
               <ChevronsUpDownIcon className="ml-auto size-4" />
             </SidebarMenuButton>
@@ -74,28 +79,20 @@ export function NavUser({ user }: { user: NavUserData }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <SparklesIcon />
-                Upgrade to Pro
+              <DropdownMenuItem className="cursor-pointer">
+                <SettingsIcon />
+                Account Settings
               </DropdownMenuItem>
-            </DropdownMenuGroup>
-            <DropdownMenuSeparator />
-            <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheckIcon />
-                Account
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <CreditCardIcon />
-                Billing
-              </DropdownMenuItem>
-              <DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <BellIcon />
                 Notifications
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={handleSignout}
+            >
               <LogOutIcon />
               Log out
             </DropdownMenuItem>

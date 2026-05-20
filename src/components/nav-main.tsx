@@ -17,24 +17,20 @@ import {
   SidebarMenuSubItem,
 } from "@/components/ui/sidebar";
 
-export type NavMainSubItem = {
+export interface NavMainSubItem {
   title: string;
   url: string;
-};
+}
 
-export type NavMainItem = {
-  title: string;
-  url: string;
+export interface NavMainItem {
   icon?: React.ReactNode;
   isActive?: boolean;
   items?: NavMainSubItem[];
-};
+  title: string;
+  url: string;
+}
 
-export function NavMain({
-  items,
-}: {
-  items: NavMainItem[];
-}) {
+export function NavMain({ items }: { items: NavMainItem[] }) {
   return (
     <SidebarGroup>
       <SidebarGroupLabel>Navigation</SidebarGroupLabel>

@@ -263,7 +263,7 @@ export function NavigationBar({
                 className="cursor-pointer font-bold text-xl opacity-90 transition-all duration-200 hover:opacity-100"
                 href="/"
               >
-                <span className="flex gap-2">
+                <span className="flex items-center gap-2">
                   <Image
                     alt="Website logo"
                     className="h-8 w-8 rounded-full"

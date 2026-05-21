@@ -254,7 +254,7 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
               className="bg-accent hover:bg-accent/70"
               tooltip="Create flashcards"
             >
-              <Link href={"/flashcard/create"}>
+              <Link href={"/flashcards/create"}>
                 <CirclePlus />
                 <span>Create Flashcards</span>
               </Link>

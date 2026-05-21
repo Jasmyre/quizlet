@@ -68,7 +68,7 @@ export function Recents() {
         </p>
       </div>
 
-      <div className="grid gap-x-8 gap-y-5 lg:grid-cols-2">
+      <div className="grid gap-x-4 gap-y-5 lg:grid-cols-2">
         {recentFlashcardSets.map((set) => (
           <Card
             className="cursor-pointer border-0 bg-transparent py-2 text-foreground shadow-none ring-0 hover:bg-muted"

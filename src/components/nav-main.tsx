@@ -25,6 +25,7 @@ import {
   CommandShortcut,
 } from "@/components/ui/command";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Kbd } from "@/components/ui/kbd";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -142,20 +143,34 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
         </DialogContent>
       </Dialog>
 
-      <SidebarGroup>
-        <SidebarInput
-          aria-label="Open command search"
-          onFocus={() => setIsCommandOpen(true)}
-          onKeyDown={(event) => {
-            if (event.key === "Enter" || event.key === " ") {
-              event.preventDefault();
-              setIsCommandOpen(true);
-            }
-          }}
-          placeholder="Search commands..."
-          readOnly
-          value=""
-        />
+      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+        <div className="relative">
+          <SidebarInput
+            aria-describedby="command-search-shortcut"
+            aria-label="Open command search"
+            className="pr-18"
+            onFocus={() => setIsCommandOpen(true)}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                setIsCommandOpen(true);
+              }
+            }}
+            placeholder="Search commands..."
+            readOnly
+            value=""
+          />
+          <div
+            className="pointer-events-none absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center gap-1"
+            id="command-search-shortcut"
+          >
+            <span className="sr-only">
+              Shortcut: Control or Command plus K
+            </span>
+            <Kbd aria-hidden="true">Ctrl</Kbd>
+            <Kbd aria-hidden="true">K</Kbd>
+          </div>
+        </div>
       </SidebarGroup>
 
       <SidebarGroup>

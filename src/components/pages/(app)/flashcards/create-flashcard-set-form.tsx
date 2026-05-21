@@ -451,7 +451,7 @@ export const CreateFlashcardSetForm = () => {
           ))}
         </FieldGroup>
 
-        <div className="flex flex-col gap-4 pb-8">
+        <div className="flex flex-col gap-4">
           <Button
             className="rounded-lg py-6"
             disabled={isPending}

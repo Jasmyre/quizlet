@@ -3,7 +3,6 @@
 import {
   ChevronRightIcon,
   MoonIcon,
-  SearchIcon,
   SettingsIcon,
   SunIcon,
 } from "lucide-react";
@@ -29,6 +28,7 @@ import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   SidebarGroup,
   SidebarGroupLabel,
+  SidebarInput,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -143,6 +143,22 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
       </Dialog>
 
       <SidebarGroup>
+        <SidebarInput
+          aria-label="Open command search"
+          onFocus={() => setIsCommandOpen(true)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              setIsCommandOpen(true);
+            }
+          }}
+          placeholder="Search commands..."
+          readOnly
+          value=""
+        />
+      </SidebarGroup>
+
+      <SidebarGroup>
         <SidebarGroupLabel>Navigation</SidebarGroupLabel>
         <SidebarMenu>
           {items.map((item) => {
@@ -197,18 +213,6 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
       <SidebarGroup>
         <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              onClick={() => setIsCommandOpen(true)}
-              tooltip="Search"
-            >
-              <SearchIcon />
-              <span>Search</span>
-              <span className="ml-auto text-muted-foreground text-xs">
-                Ctrl K
-              </span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton onClick={toggleTheme} tooltip="Toggle theme">
               {mounted && theme === "dark" ? <SunIcon /> : <MoonIcon />}

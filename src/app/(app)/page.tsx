@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { Recents } from "@/components/pages/(app)/home/recents";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -22,6 +23,11 @@ export default async function Home() {
               />
             </div>
           </header>
+          <main className="mx-auto flex w-full max-w-5xl justify-center">
+            <div className="w-full">
+              <Recents />
+            </div>
+          </main>
         </SidebarInset>
       </SidebarProvider>
     </HydrateClient>

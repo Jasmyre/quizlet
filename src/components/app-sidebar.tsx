@@ -1,6 +1,6 @@
 "use client";
 
-import { HomeIcon, UsersIcon } from "lucide-react";
+import { ChartArea, Folders, HomeIcon } from "lucide-react";
 import { useSession } from "next-auth/react";
 import { NavLogoHeader } from "@/components/nav-logo-header";
 import type { NavMainItem } from "@/components/nav-main";
@@ -30,9 +30,14 @@ const data = {
       icon: <HomeIcon />,
     },
     {
-      title: "Social",
-      url: "/social",
-      icon: <UsersIcon />,
+      title: "Your library",
+      url: "/library",
+      icon: <Folders />,
+    },
+    {
+      title: "Dashboard",
+      url: "/dashboard",
+      icon: <ChartArea />,
     },
   ],
 } satisfies {

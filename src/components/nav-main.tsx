@@ -6,7 +6,7 @@ import {
   SettingsIcon,
   SunIcon,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { type ReactNode, useEffect, useState } from "react";
 import {
@@ -78,8 +78,11 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
   const [isCommandOpen, setIsCommandOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { theme, setTheme } = useTheme();
+  const pathname = usePathname();
   const router = useRouter();
   const commandItems = getCommandItems(items);
+
+  const isCurrentPath = (url: string) => pathname === url;
 
   useEffect(() => {
     setMounted(true);
@@ -164,9 +167,7 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
             className="pointer-events-none absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center gap-1"
             id="command-search-shortcut"
           >
-            <span className="sr-only">
-              Shortcut: Control or Command plus K
-            </span>
+            <span className="sr-only">Shortcut: Control or Command plus K</span>
             <Kbd aria-hidden="true">Ctrl</Kbd>
             <Kbd aria-hidden="true">K</Kbd>
           </div>
@@ -180,7 +181,12 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
             if (!item.items?.length) {
               return (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild tooltip={item.title}>
+                  <SidebarMenuButton
+                    asChild
+                    className={"hover:bg-muted data-[active=true]:bg-accent"}
+                    isActive={isCurrentPath(item.url)}
+                    tooltip={item.title}
+                  >
                     <a href={item.url}>
                       {item.icon}
                       <span>{item.title}</span>
@@ -199,7 +205,11 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
               >
                 <SidebarMenuItem>
                   <CollapsibleTrigger asChild>
-                    <SidebarMenuButton tooltip={item.title}>
+                    <SidebarMenuButton
+                      className={"hover:bg-muted data-[active=true]:bg-accent"}
+                      isActive={isCurrentPath(item.url)}
+                      tooltip={item.title}
+                    >
                       {item.icon}
                       <span>{item.title}</span>
                       <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
@@ -209,7 +219,11 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
                     <SidebarMenuSub>
                       {item.items.map((subItem) => (
                         <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
+                          <SidebarMenuSubButton
+                            asChild
+                            className="hover:bg-muted"
+                            isActive={isCurrentPath(subItem.url)}
+                          >
                             <a href={subItem.url}>
                               <span>{subItem.title}</span>
                             </a>
@@ -229,13 +243,18 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
         <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton onClick={toggleTheme} tooltip="Toggle theme">
+            <SidebarMenuButton
+              className="hover:bg-muted"
+              onClick={toggleTheme}
+              tooltip="Toggle theme"
+            >
               {mounted && theme === "dark" ? <SunIcon /> : <MoonIcon />}
               <span>Toggle Theme</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton
+              className="hover:bg-muted"
               onClick={() => setIsCommandOpen(false)}
               tooltip="Settings"
             >

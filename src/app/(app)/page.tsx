@@ -1,4 +1,5 @@
 import { AppSidebar } from "@/components/app-sidebar";
+import { RecentTestSlider } from "@/components/pages/(app)/home/recent-test";
 import { Recents } from "@/components/pages/(app)/home/recents";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -24,7 +25,8 @@ export default async function Home() {
             </div>
           </header>
           <main className="mx-auto flex w-full max-w-5xl justify-center">
-            <div className="w-full">
+            <div className="flex w-full flex-col gap-8">
+              <RecentTestSlider />
               <Recents />
             </div>
           </main>

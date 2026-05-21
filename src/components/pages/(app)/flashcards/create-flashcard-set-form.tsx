@@ -156,11 +156,11 @@ export const CreateFlashcardSetForm = () => {
 
   return (
     <form
-      className="min-h-[calc(100vh-4rem)] bg-slate-950 px-4 pb-10 text-slate-50 sm:px-6 lg:px-8"
+      className="min-h-[calc(100vh-4rem)] px-4 pb-10 sm:px-6 lg:px-8"
       onSubmit={form.handleSubmit(onSubmit)}
     >
       <FieldSet className="mx-auto w-full max-w-7xl gap-8">
-        <div className="flex flex-col gap-4 pt-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-4 pt-4">
           <div className="gap- flex flex-row justify-between">
             <h1 className="font-bold text-2xl text-slate-50">
               Create a new flashcard set
@@ -365,13 +365,13 @@ export const CreateFlashcardSetForm = () => {
               </div>
 
               <div className="mt-5 flex flex-col gap-6">
-                <div className="flex flex-row gap-4">
+                <div className="flex flex-col gap-4 md:flex-row">
                   <Controller
                     control={form.control}
                     name={`cards.${index}.term`}
                     render={({ field, fieldState }) => (
                       <Field
-                        className="lg:col-span-6"
+                        className="min-w-0 flex-1"
                         data-invalid={fieldState.invalid}
                       >
                         <InputGroup className="border-0 px-2 py-2">
@@ -405,7 +405,7 @@ export const CreateFlashcardSetForm = () => {
                     name={`cards.${index}.definition`}
                     render={({ field, fieldState }) => (
                       <Field
-                        className="lg:col-span-5"
+                        className="min-w-0 flex-1"
                         data-invalid={fieldState.invalid}
                       >
                         <InputGroup className="border-0 px-2 py-2">

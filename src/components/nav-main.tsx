@@ -2,10 +2,12 @@
 
 import {
   ChevronRightIcon,
+  CirclePlus,
   MoonIcon,
   SettingsIcon,
   SunIcon,
 } from "lucide-react";
+import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useTheme } from "next-themes";
 import { type ReactNode, useEffect, useState } from "react";
@@ -175,7 +177,9 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
       </SidebarGroup>
 
       <SidebarGroup>
-        <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+        <SidebarGroupLabel className="text-muted-foreground">
+          Navigation
+        </SidebarGroupLabel>
         <SidebarMenu>
           {items.map((item) => {
             if (!item.items?.length) {
@@ -240,7 +244,29 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
       </SidebarGroup>
 
       <SidebarGroup>
-        <SidebarGroupLabel>Quick Actions</SidebarGroupLabel>
+        <SidebarGroupLabel className="text-muted-foreground">
+          Start here
+        </SidebarGroupLabel>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              asChild
+              className="bg-accent hover:bg-accent/70"
+              tooltip="Create flashcards"
+            >
+              <Link href={"/flashcard/create"}>
+                <CirclePlus />
+                <span>Create Flashcards</span>
+              </Link>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarGroup>
+
+      <SidebarGroup>
+        <SidebarGroupLabel className="text-muted-foreground">
+          Quick Actions
+        </SidebarGroupLabel>
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton

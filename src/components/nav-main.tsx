@@ -274,7 +274,7 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
               onClick={toggleTheme}
               tooltip="Toggle theme"
             >
-              {mounted && theme === "dark" ? <SunIcon /> : <MoonIcon />}
+              {mounted && theme === "light" ? <MoonIcon /> : <SunIcon />}
               <span>Toggle Theme</span>
             </SidebarMenuButton>
           </SidebarMenuItem>

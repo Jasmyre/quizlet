@@ -64,7 +64,8 @@ export const createFlashcardSet = async (
       success: "Flashcard set created.",
       flashcardSetId: flashcardSet.id,
     };
-  } catch {
+  } catch(e) {
+    console.error("Error creating flashcard set:", e);
     return { error: "Unable to create flashcard set. Please try again." };
   }
 };

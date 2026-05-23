@@ -1,6 +1,6 @@
 "use client";
 
-import { Moon, Sun } from "lucide-react";
+import { MoonIcon, Sun, SunIcon } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -28,10 +28,10 @@ export function ModeToggle() {
     >
       {mounted ? (
         <div>
-          {theme === "dark" ? (
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all duration-300" />
+          {theme === "light" ? (
+            <SunIcon className="h-4 w-4 rotate-0 scale-100 transition-all duration-300" />
           ) : (
-            <Moon className="h-4 w-4 rotate-0 scale-100 transition-all duration-300" />
+            <MoonIcon className="h-4 w-4 rotate-0 scale-100 transition-all duration-300" />
           )}
         </div>
       ) : (

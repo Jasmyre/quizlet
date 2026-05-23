@@ -72,9 +72,7 @@ const items: NavMainItem[] = [
   },
 ];
 
-const sidebarContentContent = async () => {
-  return <NavMain items={data.navMain} />;
-};
+const sidebarContentContent = async () => <NavMain items={data.navMain} />;
 
 const SidebarContentSkeleton = () => (
   <>

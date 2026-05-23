@@ -22,7 +22,7 @@ model User {
   // Basic fields
   id            String    @id @default(cuid())
   name          String
-  userName      String?
+  username      String?
   email         String?   @unique
   emailVerified DateTime?
   password      String?

@@ -8,7 +8,7 @@ declare module "next-auth" {
     user: {
       emailVerified: Date;
       role?: UserRole;
-      userName: string;
+      username: string;
     } & DefaultSession["user"];
   }
 }
@@ -17,6 +17,6 @@ declare module "@auth/core/jwt" {
   interface JWT {
     emailVerified: Date | null;
     role?: UserRole;
-    userName: string | null;
+    username: string | null;
   }
 }

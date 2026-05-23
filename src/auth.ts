@@ -33,8 +33,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       session.user.emailVerified = token.emailVerified as Date;
 
-      if (token.userName && session.user) {
-        session.user.userName = token.userName as string;
+      if (token.username && session.user) {
+        session.user.username = token.username as string;
       }
 
       return session;
@@ -52,7 +52,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 
       token.role = existingUser?.role;
       token.emailVerified = existingUser?.emailVerified;
-      token.userName = existingUser?.userName;
+      token.username = existingUser?.username;
 
       return token;
     },

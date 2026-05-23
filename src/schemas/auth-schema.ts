@@ -9,7 +9,7 @@ const passwordSchema = z
   .regex(/[0-9]/, "Password must include at least one number")
   .regex(
     /[^A-Za-z0-9]/,
-    "Password must include at least one special character",
+    "Password must include at least one special character"
   );
 
 export const LogInSchema = z.object({

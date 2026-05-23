@@ -54,14 +54,12 @@ type CreateFlashcardSetIntent = CreateFlashcardSetValues["intent"];
 
 const defaultCards: CreateFlashcardSetValues["cards"] = [
   {
-    term: "Globalization",
-    definition:
-      "the erosion of national boundaries and the reduced significance of national governments; moving from a world with borders to a world without borders",
+    term: "",
+    definition: "",
   },
   {
-    term: "Internationalization",
-    definition:
-      "cross-border relations between countries involving trade, finance, and communication that create international interdependence",
+    term: "",
+    definition: "",
   },
 ];
 
@@ -102,7 +100,11 @@ export const CreateFlashcardSetForm = () => {
     startTransition(async () => {
       const data = await createFlashcardSet(values);
 
-      setSuccess(data?.success);
+      setSuccess(
+        data?.flashcardSetId
+          ? `${data.success} Set ID: ${data.flashcardSetId}`
+          : data?.success
+      );
       setError(data?.error);
     });
   };
@@ -425,8 +427,6 @@ export const CreateFlashcardSetForm = () => {
                 draggedCardIndex === index && "opacity-60"
               )}
               key={card.id}
-              onDragOver={(event) => handleDragOver(event, index)}
-              onDrop={(event) => handleDrop(event, index)}
               ref={(element) => {
                 cardRefs.current[card.id] = element;
               }}
@@ -439,12 +439,14 @@ export const CreateFlashcardSetForm = () => {
                   <Button
                     aria-label={`Drag to reorder card ${index + 1}`}
                     className="cursor-grab active:cursor-grabbing"
-                    draggable={!isPending}
                     disabled={isPending}
+                    draggable={!isPending}
                     onDragEnd={handleDragEnd}
+                    onDragOver={(event) => handleDragOver(event, index)}
                     onDragStart={(event) =>
                       handleDragStart(event, index, card.id)
                     }
+                    onDrop={(event) => handleDrop(event, index)}
                     onKeyDown={(event) => handleReorderKeyDown(event, index)}
                     size="icon"
                     title="Drag to reorder"

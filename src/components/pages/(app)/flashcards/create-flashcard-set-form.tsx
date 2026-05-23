@@ -4,16 +4,22 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ArrowLeftRight,
   Globe2,
+  HandGrab,
   Image,
   Import,
   Keyboard,
   LockKeyhole,
-  Menu,
   Plus,
   Search,
   Trash2,
 } from "lucide-react";
-import { type KeyboardEvent, useRef, useState, useTransition } from "react";
+import {
+  type DragEvent,
+  type KeyboardEvent,
+  useRef,
+  useState,
+  useTransition,
+} from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import type * as z from "zod";
 import { createFlashcardSet } from "@/actions/create-flashcard-set";
@@ -40,6 +46,7 @@ import {
   InputGroupTextarea,
 } from "@/components/ui/input-group";
 import { Kbd } from "@/components/ui/kbd";
+import { cn } from "@/lib/utils";
 import { createFlashcardSetSchema } from "@/schemas/flashcard-set-schema";
 
 type CreateFlashcardSetValues = z.infer<typeof createFlashcardSetSchema>;
@@ -65,6 +72,8 @@ export const CreateFlashcardSetForm = () => {
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | undefined>(undefined);
   const [success, setSuccess] = useState<string | undefined>(undefined);
+  const [draggedCardIndex, setDraggedCardIndex] = useState<number | null>(null);
+  const cardRefs = useRef<Record<string, HTMLElement | null>>({});
   const termInputRefs = useRef<Record<number, HTMLTextAreaElement | null>>({});
   const definitionInputRefs = useRef<
     Record<number, HTMLTextAreaElement | null>
@@ -81,7 +90,7 @@ export const CreateFlashcardSetForm = () => {
     },
   });
 
-  const { fields, append, insert, remove } = useFieldArray({
+  const { fields, append, insert, move, remove } = useFieldArray({
     control: form.control,
     name: "cards",
   });
@@ -150,6 +159,85 @@ export const CreateFlashcardSetForm = () => {
     }
 
     handleAddCardBelow(index);
+  };
+
+  const handleDragStart = (
+    event: DragEvent<HTMLButtonElement>,
+    index: number,
+    cardId: string
+  ): void => {
+    if (isPending) {
+      event.preventDefault();
+      return;
+    }
+
+    const cardElement = cardRefs.current[cardId];
+
+    if (cardElement) {
+      const cardRect = cardElement.getBoundingClientRect();
+
+      event.dataTransfer.setDragImage(
+        cardElement,
+        event.clientX - cardRect.left,
+        event.clientY - cardRect.top
+      );
+    }
+
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", String(index));
+    setDraggedCardIndex(index);
+  };
+
+  const handleDragOver = (
+    event: DragEvent<HTMLElement>,
+    index: number
+  ): void => {
+    if (isPending || draggedCardIndex === null || draggedCardIndex === index) {
+      return;
+    }
+
+    event.preventDefault();
+    event.dataTransfer.dropEffect = "move";
+  };
+
+  const handleDrop = (
+    event: DragEvent<HTMLElement>,
+    targetIndex: number
+  ): void => {
+    event.preventDefault();
+
+    if (isPending || draggedCardIndex === null) {
+      setDraggedCardIndex(null);
+      return;
+    }
+
+    if (draggedCardIndex !== targetIndex) {
+      move(draggedCardIndex, targetIndex);
+    }
+
+    setDraggedCardIndex(null);
+  };
+
+  const handleDragEnd = (): void => {
+    setDraggedCardIndex(null);
+  };
+
+  const handleReorderKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    index: number
+  ): void => {
+    if (isPending || (event.key !== "ArrowUp" && event.key !== "ArrowDown")) {
+      return;
+    }
+
+    const nextIndex = event.key === "ArrowUp" ? index - 1 : index + 1;
+
+    if (nextIndex < 0 || nextIndex >= fields.length) {
+      return;
+    }
+
+    event.preventDefault();
+    move(index, nextIndex);
   };
 
   const canRemoveCards = fields.length > 2 && !isPending;
@@ -332,8 +420,16 @@ export const CreateFlashcardSetForm = () => {
         <FieldGroup className="gap-6">
           {fields.map((card, index) => (
             <section
-              className="rounded-lg bg-card p-6 text-card-foreground shadow-sm"
+              className={cn(
+                "rounded-lg bg-card p-6 text-card-foreground shadow-sm transition-opacity",
+                draggedCardIndex === index && "opacity-60"
+              )}
               key={card.id}
+              onDragOver={(event) => handleDragOver(event, index)}
+              onDrop={(event) => handleDrop(event, index)}
+              ref={(element) => {
+                cardRefs.current[card.id] = element;
+              }}
             >
               <div className="flex items-center justify-between gap-4">
                 <span className="font-bold text-card-foreground">
@@ -341,14 +437,21 @@ export const CreateFlashcardSetForm = () => {
                 </span>
                 <div className="flex items-center gap-3">
                   <Button
-                    aria-label={`Reorder card ${index + 1}`}
+                    aria-label={`Drag to reorder card ${index + 1}`}
+                    className="cursor-grab active:cursor-grabbing"
+                    draggable={!isPending}
                     disabled={isPending}
+                    onDragEnd={handleDragEnd}
+                    onDragStart={(event) =>
+                      handleDragStart(event, index, card.id)
+                    }
+                    onKeyDown={(event) => handleReorderKeyDown(event, index)}
                     size="icon"
-                    tabIndex={-1}
+                    title="Drag to reorder"
                     type="button"
                     variant="ghost"
                   >
-                    <Menu />
+                    <HandGrab />
                   </Button>
                   <Button
                     aria-label={`Remove card ${index + 1}`}

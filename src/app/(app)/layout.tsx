@@ -140,13 +140,6 @@ export default function RootLayout({
               enableSystem
             >
               <TooltipProvider>
-                {/* <NavigationBar
-                  enableBlock
-                  enableCrumbs={false}
-                  navItems={navItems}
-                  pageItems={pageItems}
-                  title="Quizlet"
-                /> */}
                 {children}
               </TooltipProvider>
             </ThemeProvider>

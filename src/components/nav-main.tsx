@@ -191,10 +191,10 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
                     isActive={isCurrentPath(item.url)}
                     tooltip={item.title}
                   >
-                    <a href={item.url}>
+                    <Link href={item.url}>
                       {item.icon}
                       <span>{item.title}</span>
-                    </a>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               );
@@ -228,9 +228,9 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
                             className="hover:bg-muted"
                             isActive={isCurrentPath(subItem.url)}
                           >
-                            <a href={subItem.url}>
+                            <Link href={subItem.url}>
                               <span>{subItem.title}</span>
-                            </a>
+                            </Link>
                           </SidebarMenuSubButton>
                         </SidebarMenuSubItem>
                       ))}

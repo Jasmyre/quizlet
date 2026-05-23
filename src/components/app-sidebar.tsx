@@ -32,36 +32,8 @@ import {
 } from "@/components/ui/sidebar";
 import { Skeleton } from "@/components/ui/skeleton";
 
-const sidebarContentContent = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
-
-  const data = {
-    navMain: [
-      {
-        title: "Home",
-        url: "/",
-        icon: <HomeIcon />,
-      },
-      {
-        title: "Your library",
-        url: "/library",
-        icon: <Folders />,
-      },
-      {
-        title: "Dashboard",
-        url: "/dashboard",
-        icon: <ChartArea />,
-      },
-    ],
-  } satisfies {
-    navMain: NavMainItem[];
-  };
-
-  return <NavMain items={data.navMain} />;
-};
-
-const SidebarContentSkeleton = () => {
-  const items: NavMainItem[] = [
+const data = {
+  navMain: [
     {
       title: "Home",
       url: "/",
@@ -77,109 +49,132 @@ const SidebarContentSkeleton = () => {
       url: "/dashboard",
       icon: <ChartArea />,
     },
-  ];
+  ],
+} satisfies {
+  navMain: NavMainItem[];
+};
 
-  return (
-    <>
-      <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-        <div className="relative">
-          <SidebarInput
-            aria-describedby="command-search-shortcut"
-            aria-label="Open command search"
-            className="pr-18"
-            disabled
-            placeholder="Search commands..."
-            readOnly
-            value=""
-          />
-          <div
-            className="pointer-events-none absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center gap-1"
-            id="command-search-shortcut"
-          >
-            <span className="sr-only">Shortcut: Control or Command plus K</span>
-            <Kbd aria-hidden="true">Ctrl</Kbd>
-            <Kbd aria-hidden="true">K</Kbd>
-          </div>
+const items: NavMainItem[] = [
+  {
+    title: "Home",
+    url: "/",
+    icon: <HomeIcon />,
+  },
+  {
+    title: "Your library",
+    url: "/library",
+    icon: <Folders />,
+  },
+  {
+    title: "Dashboard",
+    url: "/dashboard",
+    icon: <ChartArea />,
+  },
+];
+
+const sidebarContentContent = async () => {
+  return <NavMain items={data.navMain} />;
+};
+
+const SidebarContentSkeleton = () => (
+  <>
+    <SidebarGroup className="group-data-[collapsible=icon]:hidden">
+      <div className="relative">
+        <SidebarInput
+          aria-describedby="command-search-shortcut"
+          aria-label="Open command search"
+          className="pr-18"
+          disabled
+          placeholder="Search commands..."
+          readOnly
+          value=""
+        />
+        <div
+          className="pointer-events-none absolute top-1/2 right-1.5 flex -translate-y-1/2 items-center gap-1"
+          id="command-search-shortcut"
+        >
+          <span className="sr-only">Shortcut: Control or Command plus K</span>
+          <Kbd aria-hidden="true">Ctrl</Kbd>
+          <Kbd aria-hidden="true">K</Kbd>
         </div>
-      </SidebarGroup>
+      </div>
+    </SidebarGroup>
 
-      <SidebarGroup>
-        <SidebarGroupLabel className="text-muted-foreground">
-          Navigation
-        </SidebarGroupLabel>
-        <SidebarMenu>
-          {items.map((item) => (
-            <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton
-                asChild
-                className={"hover:bg-muted data-[active=true]:bg-accent"}
-                disabled
-                tooltip={item.title}
-              >
-                <Link aria-disabled href={item.url}>
-                  {item.icon}
-                  <span>{item.title}</span>
-                </Link>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          ))}
-        </SidebarMenu>
-      </SidebarGroup>
-
-      <SidebarGroup>
-        <SidebarGroupLabel className="text-muted-foreground">
-          Start here
-        </SidebarGroupLabel>
-        <SidebarMenu>
-          <SidebarMenuItem>
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-muted-foreground">
+        Navigation
+      </SidebarGroupLabel>
+      <SidebarMenu>
+        {items.map((item) => (
+          <SidebarMenuItem key={item.title}>
             <SidebarMenuButton
               asChild
-              className="bg-accent hover:bg-accent/70"
+              className={"hover:bg-muted data-[active=true]:bg-accent"}
               disabled
-              tooltip="Create flashcards"
+              tooltip={item.title}
             >
-              <Link aria-disabled href={"/flashcards/create"}>
-                <CirclePlus />
-                <span>Create Flashcards</span>
+              <Link aria-disabled href={item.url}>
+                {item.icon}
+                <span>{item.title}</span>
               </Link>
             </SidebarMenuButton>
           </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
+        ))}
+      </SidebarMenu>
+    </SidebarGroup>
 
-      <SidebarGroup>
-        <SidebarGroupLabel className="text-muted-foreground">
-          Quick Actions
-        </SidebarGroupLabel>
-        <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="hover:bg-muted"
-              disabled
-              tooltip="Toggle theme"
-            >
-              <SunIcon />
-              <span>Toggle Theme</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton
-              className="hover:bg-muted"
-              disabled
-              tooltip="Settings"
-            >
-              <SettingsIcon />
-              <span>Settings</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-        </SidebarMenu>
-      </SidebarGroup>
-    </>
-  );
-};
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-muted-foreground">
+        Start here
+      </SidebarGroupLabel>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            asChild
+            className="bg-accent hover:bg-accent/70"
+            disabled
+            tooltip="Create flashcards"
+          >
+            <Link aria-disabled href={"/flashcards/create"}>
+              <CirclePlus />
+              <span>Create Flashcards</span>
+            </Link>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarGroup>
+
+    <SidebarGroup>
+      <SidebarGroupLabel className="text-muted-foreground">
+        Quick Actions
+      </SidebarGroupLabel>
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            className="hover:bg-muted"
+            disabled
+            tooltip="Toggle theme"
+          >
+            <SunIcon />
+            <span>Toggle Theme</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+        <SidebarMenuItem>
+          <SidebarMenuButton
+            className="hover:bg-muted"
+            disabled
+            tooltip="Settings"
+          >
+            <SettingsIcon />
+            <span>Settings</span>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    </SidebarGroup>
+  </>
+);
 
 const SidebarFooterContent = async () => {
-  await new Promise((resolve) => setTimeout(resolve, 2000));
   const session = await auth();
 
   const sidebarUser: NavUserData = {
@@ -199,7 +194,6 @@ const SidebarFooterContentSkeleton = () => {
       <SidebarMenuItem>
         <SidebarMenuButton
           className="bg-card data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-          disabled
           size="lg"
         >
           <Avatar className="h-8 w-8 rounded-lg">
@@ -210,7 +204,7 @@ const SidebarFooterContentSkeleton = () => {
             <Skeleton className="h-4 w-25" />
             <Skeleton className="h-3 w-32" />
           </div>
-          <ChevronsUpDownIcon className="ml-auto size-4" />
+          <ChevronsUpDownIcon className="ml-auto size-4 text-muted-foreground" />
         </SidebarMenuButton>
       </SidebarMenuItem>
     </SidebarMenu>

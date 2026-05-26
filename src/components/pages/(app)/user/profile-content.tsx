@@ -550,7 +550,7 @@ function groupStudySetsBySection(sets: StudySet[]) {
 function getInitials(name: string) {
   return name
     .split(" ")
-    .map((part) => part.at(0))
+    .map((part) => part[0])
     .filter(Boolean)
     .join("")
     .slice(0, 2)

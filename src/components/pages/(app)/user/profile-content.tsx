@@ -1,14 +1,18 @@
 "use client";
 
 import {
+  BookmarkIcon,
   BookOpenIcon,
   CalendarIcon,
   ChevronDownIcon,
-  Copy,
+  CopyIcon,
+  FlagIcon,
   FolderIcon,
-  MessageSquareWarning,
+  MessageSquareWarningIcon,
   MoreHorizontalIcon,
+  PlayIcon,
   SearchIcon,
+  ShareIcon,
   UserPlusIcon,
   UsersIcon,
 } from "lucide-react";
@@ -239,8 +243,8 @@ function ProfileHeader({ profile }: { profile: UserProfile }) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-5">
-        <div className="flex w-full flex-row justify-between gap-4">
-          <div className="flex items-center gap-5">
+        <div className="flex w-full flex-col justify-between gap-4 lg:flex-row">
+          <div className="flex flex-row items-start gap-5 max-md:flex-col md:items-center">
             <Avatar className="size-32" size="default">
               <AvatarImage alt={profile.name} src={profile.avatarUrl} />
               <AvatarFallback>{getInitials(profile.name)}</AvatarFallback>
@@ -260,8 +264,10 @@ function ProfileHeader({ profile }: { profile: UserProfile }) {
                     <CalendarIcon />
                     {profile.joinedAt}
                   </span>
-                  <ProfileMeta value={`${profile.stats.sets} Sets`} />
-                  <ProfileMeta value={`${profile.stats.friends} friends`} />
+                  <div className="flex items-center gap-3">
+                    <ProfileMeta value={`${profile.stats.sets} Sets`} />
+                    <ProfileMeta value={`${profile.stats.friends} friends`} />
+                  </div>
                 </div>
               </div>
             </div>
@@ -306,11 +312,11 @@ function ProfileMoreMenu() {
       <DropdownMenuContent align="end">
         <DropdownMenuGroup>
           <DropdownMenuItem className="cursor-pointer">
-            <Copy />
+            <CopyIcon />
             Copy link
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
-            <MessageSquareWarning />
+            <MessageSquareWarningIcon />
             Report
           </DropdownMenuItem>
         </DropdownMenuGroup>
@@ -355,7 +361,7 @@ function StudySetToolbar({
         </InputGroupAddon>
       </InputGroup>
 
-      <div className="flex flex-wrap gap-2 lg:ml-auto">
+      <div className="flex flex-nowrap gap-2 lg:ml-auto">
         <RadioDropdown<VisibilityValue>
           label={VISIBILITY_LABELS[visibility]}
           onValueChange={onVisibilityChange}
@@ -465,14 +471,29 @@ function StudySetActionMenu({ title }: { title: string }) {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Set actions</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem>Open set</DropdownMenuItem>
-          <DropdownMenuItem>Practice</DropdownMenuItem>
-          <DropdownMenuItem>Save to folder</DropdownMenuItem>
+          <DropdownMenuItem>
+            <BookOpenIcon />
+            Open set
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <PlayIcon />
+            Practice
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <BookmarkIcon />
+            Save to folder
+          </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>Share</DropdownMenuItem>
-          <DropdownMenuItem>Report</DropdownMenuItem>
+          <DropdownMenuItem>
+            <ShareIcon />
+            Share
+          </DropdownMenuItem>
+          <DropdownMenuItem>
+            <FlagIcon />
+            Report
+          </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

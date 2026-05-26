@@ -121,7 +121,7 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
   );
 
   return (
-    <div className="flex w-full flex-col gap-8 px-4 pb-10">
+    <div className="flex w-full min-w-0 flex-col gap-8 px-4 pb-10">
       <ProfileHeader profile={profile} />
 
       <Tabs className="gap-6" defaultValue="flashcard-sets">
@@ -155,19 +155,22 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
           <div
             className={
               viewMode === "grid"
-                ? "grid gap-3 lg:grid-cols-2"
-                : "flex flex-col gap-5"
+                ? "grid min-w-0 gap-3 lg:grid-cols-2"
+                : "flex min-w-0 flex-col gap-5"
             }
           >
             {groupedStudySets.map(([sectionLabel, sets]) => (
-              <section className="flex flex-col gap-2" key={sectionLabel}>
-                <div className="flex items-center gap-3">
+              <section
+                className="flex min-w-0 flex-col gap-2"
+                key={sectionLabel}
+              >
+                <div className="flex min-w-0 items-center gap-3">
                   <h2 className="font-heading font-semibold text-muted-foreground text-xs uppercase tracking-normal">
                     {sectionLabel}
                   </h2>
                   <Separator className="flex-1" />
                 </div>
-                <div className="flex flex-col gap-4">
+                <div className="flex min-w-0 flex-col gap-4">
                   {sets.map((set) => (
                     <StudySetRow key={set.id} set={set} />
                   ))}
@@ -243,14 +246,14 @@ function ProfileHeader({ profile }: { profile: UserProfile }) {
   return (
     <section className="flex flex-col gap-5">
       <div className="flex flex-col gap-5">
-        <div className="flex w-full flex-col justify-between gap-4 lg:flex-row">
-          <div className="flex flex-row items-start gap-5 max-md:flex-col md:items-center">
+        <div className="flex w-full min-w-0 flex-col justify-between gap-4 md:flex-row">
+          <div className="flex min-w-0 flex-row items-start gap-5 max-md:flex-col md:items-center">
             <Avatar className="size-32" size="default">
               <AvatarImage alt={profile.name} src={profile.avatarUrl} />
               <AvatarFallback>{getInitials(profile.name)}</AvatarFallback>
             </Avatar>
 
-            <div>
+            <div className="min-w-0">
               <div className="flex min-w-0 flex-col gap-3">
                 <div className="flex min-w-0 flex-col gap-1">
                   <h1 className="truncate font-heading font-semibold text-2xl tracking-normal">
@@ -259,7 +262,7 @@ function ProfileHeader({ profile }: { profile: UserProfile }) {
                   <p className="text-muted-foreground text-sm">{profile.bio}</p>
                 </div>
 
-                <div className="flex flex-wrap items-center gap-3 text-muted-foreground text-sm">
+                <div className="flex min-w-0 flex-wrap items-center gap-3 text-muted-foreground text-sm">
                   <span className="flex items-center gap-1.5">
                     <CalendarIcon />
                     {profile.joinedAt}
@@ -273,7 +276,7 @@ function ProfileHeader({ profile }: { profile: UserProfile }) {
             </div>
           </div>
 
-          <div className="flex gap-2">
+          <div className="flex shrink-0 gap-2">
             <ButtonGroup className="w-full md:w-fit">
               <Button
                 className="flex-1 md:flex-none"
@@ -433,8 +436,8 @@ function RadioDropdown<TValue extends string>({
 
 function StudySetRow({ set }: { set: StudySet }) {
   return (
-    <Card className="transition-colors hover:bg-muted/50" size="sm">
-      <CardContent className={"flex flex-row justify-between gap-4"}>
+    <Card className="min-w-0 transition-colors hover:bg-muted/50" size="sm">
+      <CardContent className="flex min-w-0 flex-row justify-between gap-4">
         <div className="min-w-0">
           <p className="font-medium text-muted-foreground text-xs">
             {set.terms} Terms

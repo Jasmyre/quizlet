@@ -48,10 +48,10 @@ import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import type { UserProfile } from "@/schemas/user-profile-schema";
 
-type StudySet = UserProfile["studySets"][number];
+type FlashcardSet = UserProfile["flashcardSets"][number];
 type FilterValue = "all" | "recent" | "high-score" | "needs-practice";
 type SortValue = "latest" | "score" | "terms";
-type VisibilityValue = "all" | StudySet["visibility"];
+type VisibilityValue = "all" | FlashcardSet["visibility"];
 type ViewMode = "list" | "grid";
 
 const SORT_LABELS: Record<SortValue, string> = {
@@ -62,34 +62,40 @@ const SORT_LABELS: Record<SortValue, string> = {
 
 const VISIBILITY_LABELS: Record<VisibilityValue, string> = {
   all: "All visibility",
-  private: "Private",
-  public: "Public",
-  unlisted: "Unlisted",
+  PUBLIC: "Public",
 };
 
 export function ProfileContent({ profile }: { profile: UserProfile }) {
   const [query, setQuery] = useState("");
   const [filter, setFilter] = useState<FilterValue>("all");
-  const [subject, setSubject] = useState("all");
+  const [category, setCategory] = useState("all");
   const [visibility, setVisibility] = useState<VisibilityValue>("all");
   const [sort, setSort] = useState<SortValue>("latest");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
 
-  const subjects = useMemo(
-    () => Array.from(new Set(profile.studySets.map((set) => set.subject))),
-    [profile.studySets]
+  const categories = useMemo(
+    () =>
+      Array.from(
+        new Set(
+          profile.flashcardSets.map((set) => set.description ?? "Uncategorized")
+        )
+      ),
+    [profile.flashcardSets]
   );
 
   const visibleStudySets = useMemo(() => {
     const normalizedQuery = query.trim().toLowerCase();
 
-    return profile.studySets
+    return profile.flashcardSets
       .filter((set) => {
+        const searchableDescription = set.description ?? "";
         const matchesSearch =
           normalizedQuery.length === 0 ||
           set.title.toLowerCase().includes(normalizedQuery) ||
-          set.subject.toLowerCase().includes(normalizedQuery);
-        const matchesSubject = subject === "all" || set.subject === subject;
+          searchableDescription.toLowerCase().includes(normalizedQuery);
+        const matchesCategory =
+          category === "all" ||
+          (set.description ?? "Uncategorized") === category;
         const matchesVisibility =
           visibility === "all" || set.visibility === visibility;
         const matchesFilter =
@@ -99,7 +105,7 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
           (filter === "needs-practice" && set.avgScore < 75);
 
         return (
-          matchesSearch && matchesSubject && matchesVisibility && matchesFilter
+          matchesSearch && matchesCategory && matchesVisibility && matchesFilter
         );
       })
       .sort((firstSet, secondSet) => {
@@ -108,12 +114,12 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
         }
 
         if (sort === "terms") {
-          return secondSet.terms - firstSet.terms;
+          return secondSet.flashcardCount - firstSet.flashcardCount;
         }
 
         return secondSet.studiedAtOrder - firstSet.studiedAtOrder;
       });
-  }, [filter, profile.studySets, query, sort, subject, visibility]);
+  }, [category, filter, profile.flashcardSets, query, sort, visibility]);
 
   const groupedStudySets = useMemo(
     () => groupStudySetsBySection(visibleStudySets),
@@ -135,17 +141,17 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
 
         <TabsContent className="flex flex-col gap-6" value="flashcard-sets">
           <StudySetToolbar
+            categories={categories}
+            category={category}
             filter={filter}
+            onCategoryChange={setCategory}
             onFilterChange={setFilter}
             onQueryChange={setQuery}
             onSortChange={setSort}
-            onSubjectChange={setSubject}
             onViewModeChange={setViewMode}
             onVisibilityChange={setVisibility}
             query={query}
             sort={sort}
-            subject={subject}
-            subjects={subjects}
             viewMode={viewMode}
             visibility={visibility}
           />
@@ -302,6 +308,9 @@ function ProfileMoreMenu() {
 }
 
 function StudySetToolbar({
+  categories,
+  category,
+  onCategoryChange,
   onQueryChange,
   onSortChange,
   onVisibilityChange,
@@ -309,17 +318,17 @@ function StudySetToolbar({
   sort,
   visibility,
 }: {
+  categories: string[];
+  category: string;
   filter: FilterValue;
+  onCategoryChange: (value: string) => void;
   onFilterChange: (value: FilterValue) => void;
   onQueryChange: (value: string) => void;
   onSortChange: (value: SortValue) => void;
-  onSubjectChange: (value: string) => void;
   onViewModeChange: (value: ViewMode) => void;
   onVisibilityChange: (value: VisibilityValue) => void;
   query: string;
   sort: SortValue;
-  subject: string;
-  subjects: string[];
   viewMode: ViewMode;
   visibility: VisibilityValue;
 }) {
@@ -344,9 +353,17 @@ function StudySetToolbar({
           value={visibility}
           values={[
             ["all", "All visibility"],
-            ["public", "Public"],
-            ["private", "Private"],
-            ["unlisted", "Unlisted"],
+            ["PUBLIC", "Public"],
+          ]}
+        />
+
+        <RadioDropdown
+          label={category === "all" ? "All categories" : category}
+          onValueChange={onCategoryChange}
+          value={category}
+          values={[
+            ["all", "All categories"],
+            ...categories.map((item) => [item, item] as const),
           ]}
         />
 
@@ -407,20 +424,20 @@ function RadioDropdown<TValue extends string>({
   );
 }
 
-function StudySetRow({ set }: { set: StudySet }) {
+function StudySetRow({ set }: { set: FlashcardSet }) {
   return (
     <Card className="min-w-0 transition-colors hover:bg-muted/50" size="sm">
       <CardContent className="flex min-w-0 flex-row justify-between gap-4">
         <div className="min-w-0">
           <p className="font-medium text-muted-foreground text-xs">
-            {set.terms} Terms
+            {set.flashcardCount} Terms
           </p>
           <h3 className="mb-4 truncate font-heading font-semibold text-base">
             {set.title}
           </h3>
           <p className="flex items-center gap-1.5 text-muted-foreground text-sm">
             <FolderIcon />
-            {set.subject}
+            {set.description ?? "No description"}
           </p>
         </div>
         <div className="md:self-start">
@@ -508,8 +525,8 @@ function LibraryCard({
   );
 }
 
-function groupStudySetsBySection(sets: StudySet[]) {
-  const groups = new Map<string, StudySet[]>();
+function groupStudySetsBySection(sets: FlashcardSet[]) {
+  const groups = new Map<string, FlashcardSet[]>();
 
   for (const set of sets) {
     const existingSets = groups.get(set.sectionLabel) ?? [];

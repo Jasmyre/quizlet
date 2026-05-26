@@ -1,13 +1,15 @@
 import z from "zod";
 
-export const userProfileStudySetSchema = z.object({
+export const userProfileFlashcardSetSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
+  description: z.string().nullable(),
+  visibility: z.enum(["PUBLIC"]),
+  createdAt: z.string().min(1),
+  updatedAt: z.string().min(1),
+  userId: z.string().min(1),
   sectionLabel: z.string().min(1),
-  subject: z.string().min(1),
-  visibility: z.enum(["public", "private", "unlisted"]),
-  terms: z.number().int().nonnegative(),
-  lastStudied: z.string().min(1),
+  flashcardCount: z.number().int().nonnegative(),
   studiedAtOrder: z.number().int(),
   avgScore: z.number().int().min(0).max(100),
   practiceCount: z.number().int().nonnegative(),
@@ -40,7 +42,7 @@ export const userProfileSchema = z.object({
     folders: z.number().int().nonnegative(),
     friends: z.number().int().nonnegative(),
   }),
-  studySets: z.array(userProfileStudySetSchema),
+  flashcardSets: z.array(userProfileFlashcardSetSchema),
   classes: z.array(userProfileClassSchema),
   folders: z.array(userProfileFolderSchema),
 });

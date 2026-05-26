@@ -154,7 +154,7 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
             aria-describedby="command-search-shortcut"
             aria-label="Open command search"
             className="pr-18"
-            onFocus={() => setIsCommandOpen(true)}
+            onClick={() => setIsCommandOpen(true)}
             onKeyDown={(event) => {
               if (event.key === "Enter" || event.key === " ") {
                 event.preventDefault();

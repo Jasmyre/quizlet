@@ -5,7 +5,9 @@ import {
   ChevronsUpDownIcon,
   LogOutIcon,
   SettingsIcon,
+  User,
 } from "lucide-react";
+import Link from "next/link";
 import { signout } from "@/actions/sign-out";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -80,8 +82,12 @@ export function NavUser({ user }: { user: NavUserData }) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="cursor-pointer">
+                <User />
+                <Link href={`/user/${user.name}`}>Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <SettingsIcon />
-                Account Settings
+                Settings
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <BellIcon />

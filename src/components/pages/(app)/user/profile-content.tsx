@@ -130,8 +130,6 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
             <TabsTrigger value="flashcard-sets">Flashcard sets</TabsTrigger>
             <TabsTrigger value="classes">Classes</TabsTrigger>
             <TabsTrigger value="folders">Folders</TabsTrigger>
-            <TabsTrigger value="practice-tests">Practice tests</TabsTrigger>
-            <TabsTrigger value="study-guides">Study guides</TabsTrigger>
           </TabsList>
         </div>
 
@@ -209,31 +207,6 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
               icon={FolderIcon}
               key={folder.id}
               title={folder.name}
-            />
-          ))}
-        </TabsContent>
-
-        <TabsContent
-          className="grid gap-3 sm:grid-cols-2"
-          value="practice-tests"
-        >
-          {profile.practiceTests.map((test) => (
-            <LibraryCard
-              description={`${test.questionCount} questions · ${test.lastAttempt}`}
-              icon={BookOpenIcon}
-              key={test.id}
-              title={test.title}
-            />
-          ))}
-        </TabsContent>
-
-        <TabsContent className="grid gap-3 sm:grid-cols-2" value="study-guides">
-          {profile.studyGuides.map((guide) => (
-            <LibraryCard
-              description={`${guide.pageCount} pages · ${guide.updatedAt}`}
-              icon={BookOpenIcon}
-              key={guide.id}
-              title={guide.title}
             />
           ))}
         </TabsContent>
@@ -474,26 +447,26 @@ function StudySetActionMenu({ title }: { title: string }) {
       <DropdownMenuContent align="end">
         <DropdownMenuLabel>Set actions</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <BookOpenIcon />
             Open set
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <PlayIcon />
             Practice
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <BookmarkIcon />
             Save to folder
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <ShareIcon />
             Share
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer">
             <FlagIcon />
             Report
           </DropdownMenuItem>

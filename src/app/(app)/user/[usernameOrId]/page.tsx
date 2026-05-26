@@ -45,43 +45,13 @@ const mockUserProfile = userProfileSchema.parse({
   id: "user-01",
   joinedAt: "Joined Jan 2024",
   name: "Jazmyre Andrei",
-  practiceTests: [
-    {
-      id: "practice-camping-knots",
-      lastAttempt: "Practiced 3d ago",
-      questionCount: 20,
-      title: "Essential Rope Knots Practice",
-    },
-    {
-      id: "practice-social-ethics",
-      lastAttempt: "Practiced 5d ago",
-      questionCount: 22,
-      title: "Globalization and Ethics Drill",
-    },
-  ],
   stats: {
     cards: 186,
     classes: 2,
     folders: 2,
     friends: 37,
-    practiceTests: 2,
     sets: 4,
-    studyGuides: 2,
   },
-  studyGuides: [
-    {
-      id: "guide-social-perspectives",
-      pageCount: 12,
-      title: "Generational Perspectives Study Guide",
-      updatedAt: "Updated 1w ago",
-    },
-    {
-      id: "guide-camping-ropes",
-      pageCount: 8,
-      title: "Camping Rope Safety Notes",
-      updatedAt: "Updated Apr 8",
-    },
-  ],
   studySets: [
     {
       avgScore: 82,

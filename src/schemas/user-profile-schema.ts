@@ -26,20 +26,6 @@ export const userProfileClassSchema = z.object({
   setCount: z.number().int().nonnegative(),
 });
 
-export const userProfilePracticeTestSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  questionCount: z.number().int().nonnegative(),
-  lastAttempt: z.string().min(1),
-});
-
-export const userProfileStudyGuideSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  pageCount: z.number().int().nonnegative(),
-  updatedAt: z.string().min(1),
-});
-
 export const userProfileSchema = z.object({
   id: z.string().min(1),
   username: z.string().min(1),
@@ -53,14 +39,10 @@ export const userProfileSchema = z.object({
     classes: z.number().int().nonnegative(),
     folders: z.number().int().nonnegative(),
     friends: z.number().int().nonnegative(),
-    practiceTests: z.number().int().nonnegative(),
-    studyGuides: z.number().int().nonnegative(),
   }),
   studySets: z.array(userProfileStudySetSchema),
   classes: z.array(userProfileClassSchema),
   folders: z.array(userProfileFolderSchema),
-  practiceTests: z.array(userProfilePracticeTestSchema),
-  studyGuides: z.array(userProfileStudyGuideSchema),
 });
 
 export type UserProfile = z.infer<typeof userProfileSchema>;

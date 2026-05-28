@@ -2,6 +2,7 @@
 
 import type * as z from "zod";
 import { auth } from "@/auth";
+import { flashcardSetVisibilityByFormValue } from "@/lib/flashcard-set-visibility";
 import { createFlashcardSetSchema } from "@/schemas/flashcard-set-schema";
 import { db } from "@/server/db";
 
@@ -17,10 +18,6 @@ type CreateFlashcardSetResult =
       success?: undefined;
       flashcardSetId?: undefined;
     };
-
-const flashcardSetVisibilityByFormValue = {
-  public: "PUBLIC",
-} as const satisfies Record<CreateFlashcardSetValues["visibility"], "PUBLIC">;
 
 export const createFlashcardSet = async (
   values: CreateFlashcardSetValues
@@ -64,8 +61,8 @@ export const createFlashcardSet = async (
       success: "Flashcard set created.",
       flashcardSetId: flashcardSet.id,
     };
-  } catch(e) {
-    console.error("Error creating flashcard set:", e);
+  } catch (error) {
+    console.error("Error creating flashcard set:", error);
     return { error: "Unable to create flashcard set. Please try again." };
   }
 };

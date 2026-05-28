@@ -1,4 +1,5 @@
 import z from "zod";
+import { flashcardSetVisibilityFormValues } from "@/lib/flashcard-set-visibility";
 
 const flashcardSchema = z.object({
   term: z
@@ -24,7 +25,7 @@ export const createFlashcardSetSchema = z.object({
     .trim()
     .max(500, "Description must be at most 500 characters long")
     .optional(),
-  visibility: z.literal("public"),
+  visibility: z.enum(flashcardSetVisibilityFormValues),
   intent: z.enum(["create", "practice"]),
   cards: z
     .array(flashcardSchema)

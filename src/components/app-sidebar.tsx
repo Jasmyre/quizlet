@@ -176,7 +176,7 @@ const SidebarFooterContent = async () => {
   const session = await auth();
 
   const sidebarUser: NavUserData = {
-    name: session?.user?.name ?? "User",
+    username: session?.user?.username ?? "User",
     email: session?.user?.email ?? "user@example.com",
     avatar: session?.user?.image ?? "/avatars/shadcn.jpg",
   };

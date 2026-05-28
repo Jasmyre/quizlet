@@ -14,8 +14,10 @@ import {
   Trash2,
 } from "lucide-react";
 import {
+  type ComponentType,
   type DragEvent,
   type KeyboardEvent,
+  type SVGProps,
   useRef,
   useState,
   useTransition,
@@ -65,6 +67,28 @@ const defaultCards: CreateFlashcardSetValues["cards"] = [
 
 const iconButtonClassName =
   "rounded-full bg-secondary text-secondary-foreground hover:bg-accent";
+
+const visibilityOptions = [
+  {
+    icon: Globe2,
+    label: "Public",
+    value: "public",
+  },
+  {
+    icon: LockKeyhole,
+    label: "Private",
+    value: "private",
+  },
+] as const satisfies readonly {
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
+  label: string;
+  value: CreateFlashcardSetValues["visibility"];
+}[];
+
+const visibilityLabelByValue = {
+  private: "Private",
+  public: "Public",
+} as const satisfies Record<CreateFlashcardSetValues["visibility"], string>;
 
 export const CreateFlashcardSetForm = () => {
   const [isPending, startTransition] = useTransition();
@@ -276,17 +300,53 @@ export const CreateFlashcardSetForm = () => {
             </div>
           </div>
 
-          <div className="flex">
-            <Button
-              className="rounded-full px-4"
-              disabled={isPending}
-              type="button"
-              variant="secondary"
-            >
-              <Globe2 data-icon="inline-start" />
-              Public
-            </Button>
-          </div>
+          <Controller
+            control={form.control}
+            name="visibility"
+            render={({ field }) => {
+              const selectedOption =
+                visibilityOptions.find(
+                  (option) => option.value === field.value
+                ) ?? visibilityOptions[0];
+              const SelectedIcon = selectedOption.icon;
+
+              return (
+                <Field className="flex">
+                  <FieldLabel className="sr-only">Visibility</FieldLabel>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button
+                        className="rounded-full px-4"
+                        disabled={isPending}
+                        type="button"
+                        variant="secondary"
+                      >
+                        <SelectedIcon data-icon="inline-start" />
+                        {visibilityLabelByValue[field.value]}
+                      </Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="start">
+                      <DropdownMenuGroup>
+                        {visibilityOptions.map((option) => {
+                          const OptionIcon = option.icon;
+                          return (
+                            <DropdownMenuItem
+                              className="cursor-pointer"
+                              key={option.value}
+                              onSelect={() => field.onChange(option.value)}
+                            >
+                              <OptionIcon />
+                              {option.label}
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </Field>
+              );
+            }}
+          />
         </div>
 
         <FieldGroup className="gap-5">

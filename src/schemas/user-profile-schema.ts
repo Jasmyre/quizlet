@@ -1,10 +1,11 @@
 import z from "zod";
+import { flashcardSetVisibilityValues } from "@/lib/flashcard-set-visibility";
 
 export const userProfileFlashcardSetSchema = z.object({
   id: z.string().min(1),
   title: z.string().min(1),
   description: z.string().nullable(),
-  visibility: z.enum(["PUBLIC"]),
+  visibility: z.enum(flashcardSetVisibilityValues),
   createdAt: z.string().min(1),
   updatedAt: z.string().min(1),
   userId: z.string().min(1),

@@ -46,6 +46,7 @@ import {
 } from "@/components/ui/input-group";
 import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { flashcardSetVisibilityLabels } from "@/lib/flashcard-set-visibility";
 import type { UserProfile } from "@/schemas/user-profile-schema";
 
 type FlashcardSet = UserProfile["flashcardSets"][number];
@@ -62,7 +63,7 @@ const SORT_LABELS: Record<SortValue, string> = {
 
 const VISIBILITY_LABELS: Record<VisibilityValue, string> = {
   all: "All visibility",
-  PUBLIC: "Public",
+  ...flashcardSetVisibilityLabels,
 };
 
 export function ProfileContent({ profile }: { profile: UserProfile }) {
@@ -183,14 +184,14 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
             ))}
 
             {visibleStudySets.length === 0 && (
-              <Card size="sm">
-                <CardHeader>
-                  <CardTitle>No flashcard sets found</CardTitle>
-                  <CardDescription>
-                    Try a different search term or clear one of the filters.
-                  </CardDescription>
-                </CardHeader>
-              </Card>
+              <div className="flex min-w-0 flex-col gap-1 py-2">
+                <h2 className="font-heading font-semibold text-muted-foreground text-xs uppercase tracking-normal">
+                  No flashcard sets found
+                </h2>
+                <span className="text-muted-foreground">
+                  Try a different search term or clear one of the filters.
+                </span>
+              </div>
             )}
           </div>
         </TabsContent>
@@ -354,6 +355,7 @@ function StudySetToolbar({
           values={[
             ["all", "All visibility"],
             ["PUBLIC", "Public"],
+            ["PRIVATE", "Private"],
           ]}
         />
 

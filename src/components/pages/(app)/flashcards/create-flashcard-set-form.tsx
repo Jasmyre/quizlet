@@ -66,7 +66,7 @@ const defaultCards: CreateFlashcardSetValues["cards"] = [
 ];
 
 const iconButtonClassName =
-  "rounded-full bg-secondary text-secondary-foreground hover:bg-accent";
+  "bg-secondary text-secondary-foreground hover:bg-accent";
 
 const visibilityOptions = [
   {
@@ -274,79 +274,12 @@ export const CreateFlashcardSetForm = () => {
       onSubmit={form.handleSubmit(onSubmit)}
     >
       <FieldSet className="mx-auto w-full max-w-7xl gap-8">
-        <div className="flex flex-col gap-4 pt-4">
+        <div className="flex flex-row flex-wrap justify-between gap-4 pt-4">
           <div className="gap- flex flex-row justify-between">
             <h1 className="font-bold text-2xl text-slate-50">
               Create a new flashcard set
             </h1>
-            <div className="hidden flex-wrap gap-3 md:flex">
-              <Button
-                className="rounded-full px-6"
-                disabled={isPending}
-                onClick={() => handleSubmitIntent("create")}
-                type="submit"
-                variant={"outline"}
-              >
-                Create
-              </Button>
-              <Button
-                className="rounded-full px-6"
-                disabled={isPending}
-                onClick={() => handleSubmitIntent("practice")}
-                type="submit"
-              >
-                Create and practice
-              </Button>
-            </div>
           </div>
-
-          <Controller
-            control={form.control}
-            name="visibility"
-            render={({ field }) => {
-              const selectedOption =
-                visibilityOptions.find(
-                  (option) => option.value === field.value
-                ) ?? visibilityOptions[0];
-              const SelectedIcon = selectedOption.icon;
-
-              return (
-                <Field className="flex">
-                  <FieldLabel className="sr-only">Visibility</FieldLabel>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        className="rounded-full px-4"
-                        disabled={isPending}
-                        type="button"
-                        variant="secondary"
-                      >
-                        <SelectedIcon data-icon="inline-start" />
-                        {visibilityLabelByValue[field.value]}
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                      <DropdownMenuGroup>
-                        {visibilityOptions.map((option) => {
-                          const OptionIcon = option.icon;
-                          return (
-                            <DropdownMenuItem
-                              className="cursor-pointer"
-                              key={option.value}
-                              onSelect={() => field.onChange(option.value)}
-                            >
-                              <OptionIcon />
-                              {option.label}
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </DropdownMenuGroup>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </Field>
-              );
-            }}
-          />
         </div>
 
         <FieldGroup className="gap-5">
@@ -388,22 +321,72 @@ export const CreateFlashcardSetForm = () => {
               </Field>
             )}
           />
+
+          <div className="flex gap-4">
+            <Controller
+              control={form.control}
+              name="visibility"
+              render={({ field }) => {
+                const selectedOption =
+                  visibilityOptions.find(
+                    (option) => option.value === field.value
+                  ) ?? visibilityOptions[0];
+                const SelectedIcon = selectedOption.icon;
+
+                return (
+                  <Field className="flex">
+                    <FieldLabel className="sr-only">Visibility</FieldLabel>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          className="max-w-min px-4"
+                          disabled={isPending}
+                          type="button"
+                          variant="secondary"
+                        >
+                          <SelectedIcon data-icon="inline-start" />
+                          {visibilityLabelByValue[field.value]}
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="start">
+                        <DropdownMenuGroup>
+                          {visibilityOptions.map((option) => {
+                            const OptionIcon = option.icon;
+                            return (
+                              <DropdownMenuItem
+                                className="cursor-pointer"
+                                key={option.value}
+                                onSelect={() => field.onChange(option.value)}
+                              >
+                                <OptionIcon />
+                                {option.label}
+                              </DropdownMenuItem>
+                            );
+                          })}
+                        </DropdownMenuGroup>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </Field>
+                );
+              }}
+            />
+          </div>
         </FieldGroup>
 
         <div className="flex flex-row flex-wrap justify-between gap-4">
           <div className="flex flex-row gap-2">
-            <Button className="rounded-full" type="button" variant="secondary">
+            <Button type="button" variant="secondary">
               <Import data-icon="inline-start" />
               Import
             </Button>
-            <Button className="rounded-full" type="button" variant="secondary">
+            <Button type="button" variant="secondary">
               <Plus data-icon="inline-start" />
               Add diagram
               <LockKeyhole data-icon="inline-end" />
             </Button>
           </div>
 
-          <div className="fle-row flex items-center gap-2">
+          <div className="flex items-center gap-2">
             <Button
               aria-label="Search cards"
               className={iconButtonClassName}
@@ -630,6 +613,28 @@ export const CreateFlashcardSetForm = () => {
 
           <FormError message={error} />
           <FormSuccess message={success} />
+        </div>
+
+        <div className="flex flex-col flex-wrap gap-3">
+          <Button
+            className="border-none px-6"
+            disabled={isPending}
+            onClick={() => handleSubmitIntent("practice")}
+            size="lg"
+            type="submit"
+          >
+            Create and practice
+          </Button>
+          <Button
+            className="border-none px-6"
+            disabled={isPending}
+            onClick={() => handleSubmitIntent("create")}
+            size="lg"
+            type="submit"
+            variant={"outline"}
+          >
+            Create
+          </Button>
         </div>
       </FieldSet>
     </form>

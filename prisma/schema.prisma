@@ -38,6 +38,8 @@ model User {
 
   accounts      Account[]
   flashcardSets FlashcardSet[] // Relation to their created sets
+
+  @@index([username])
 }
 
 model Account {
@@ -94,5 +96,6 @@ enum UserRole {
 }
 
 enum FlashcardSetVisibility {
+  PRIVATE
   PUBLIC
 }

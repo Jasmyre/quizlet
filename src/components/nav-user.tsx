@@ -8,6 +8,7 @@ import {
   User,
 } from "lucide-react";
 import Link from "next/link";
+import { useSession } from "next-auth/react";
 import { signout } from "@/actions/sign-out";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -25,11 +26,51 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export interface NavUserData {
   avatar: string;
   email: string;
   username: string;
+}
+
+export function SidebarFooterContent() {
+  const { data: session, status } = useSession();
+
+  if (status === "loading") {
+    return <SidebarFooterContentSkeleton />;
+  }
+
+  const sidebarUser: NavUserData = {
+    username: session?.user?.username ?? "User",
+    email: session?.user?.email ?? "user@example.com",
+    avatar: session?.user?.image ?? "/avatars/shadcn.jpg",
+  };
+
+  return <NavUser user={sidebarUser} />;
+}
+
+function SidebarFooterContentSkeleton() {
+  return (
+    <SidebarMenu>
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          className="bg-card data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+          size="lg"
+        >
+          <Avatar className="h-8 w-8 rounded-lg">
+            <AvatarImage alt="avatar" src="/avatars/shadcn.jpg" />
+            <AvatarFallback className="rounded-lg" />
+          </Avatar>
+          <div className="grid flex-1 text-left text-sm leading-tight">
+            <Skeleton className="h-4 w-25" />
+            <Skeleton className="h-3 w-32" />
+          </div>
+          <ChevronsUpDownIcon className="ml-auto size-4 text-muted-foreground" />
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    </SidebarMenu>
+  );
 }
 
 export function NavUser({ user }: { user: NavUserData }) {

@@ -1,6 +1,5 @@
 import {
   ChartArea,
-  ChevronsUpDownIcon,
   CirclePlus,
   Folders,
   HomeIcon,
@@ -9,12 +8,10 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
-import { auth } from "@/auth";
 import { NavLogoHeader } from "@/components/nav-logo-header";
 import type { NavMainItem } from "@/components/nav-main";
 import { NavMain } from "@/components/nav-main";
-import { NavUser, type NavUserData } from "@/components/nav-user";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { SidebarFooterContent } from "@/components/nav-user";
 import { Kbd } from "@/components/ui/kbd";
 import { Separator } from "@/components/ui/separator";
 import {
@@ -30,7 +27,6 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { Skeleton } from "@/components/ui/skeleton";
 
 const data = {
   navMain: [
@@ -172,43 +168,6 @@ const SidebarContentSkeleton = () => (
   </>
 );
 
-const SidebarFooterContent = async () => {
-  const session = await auth();
-
-  const sidebarUser: NavUserData = {
-    username: session?.user?.username ?? "User",
-    email: session?.user?.email ?? "user@example.com",
-    avatar: session?.user?.image ?? "/avatars/shadcn.jpg",
-  };
-
-  return <NavUser user={sidebarUser} />;
-};
-
-const SidebarFooterContentSkeleton = () => {
-  "use client";
-
-  return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <SidebarMenuButton
-          className="bg-card data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
-          size="lg"
-        >
-          <Avatar className="h-8 w-8 rounded-lg">
-            <AvatarImage alt={"avatar"} src={"/avatars/shadcn.jpg"} />
-            <AvatarFallback className="rounded-lg" />
-          </Avatar>
-          <div className="grid flex-1 text-left text-sm leading-tight">
-            <Skeleton className="h-4 w-25" />
-            <Skeleton className="h-3 w-32" />
-          </div>
-          <ChevronsUpDownIcon className="ml-auto size-4 text-muted-foreground" />
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    </SidebarMenu>
-  );
-};
-
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
@@ -222,9 +181,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </Suspense>
       </SidebarContent>
       <SidebarFooter className="bg-background">
-        <Suspense fallback={<SidebarFooterContentSkeleton />}>
-          <SidebarFooterContent />
-        </Suspense>
+        <SidebarFooterContent />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

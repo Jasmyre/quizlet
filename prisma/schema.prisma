@@ -38,6 +38,11 @@ model User {
 
   accounts      Account[]
   flashcardSets FlashcardSet[] // Relation to their created sets
+  folders       Folder[]       @relation("FolderOwner")
+  ownedClasses  Classroom[]    @relation("ClassroomOwner")
+  classMembers  ClassMember[]
+
+  @@index([username])
 }
 
 model Account {
@@ -70,6 +75,8 @@ model FlashcardSet {
   userId     String
   user       User        @relation(fields: [userId], references: [id], onDelete: Cascade)
   flashcards Flashcard[]
+  folders    FolderFlashcardSet[]
+  classes    ClassFlashcardSet[]
 
   @@index([userId]) // Quick lookup for a user's sets
 }
@@ -88,11 +95,75 @@ model Flashcard {
   @@index([flashcardSetId]) // Quick lookup for cards within a specific set
 }
 
+model Folder {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId       String
+  owner         User                 @relation("FolderOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  flashcardSets FolderFlashcardSet[]
+
+  @@index([ownerId])
+}
+
+model FolderFlashcardSet {
+  folderId       String
+  flashcardSetId String
+
+  folder       Folder       @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  flashcardSet FlashcardSet @relation(fields: [flashcardSetId], references: [id], onDelete: Cascade)
+
+  @@id([folderId, flashcardSetId])
+  @@index([flashcardSetId])
+}
+
+model Classroom {
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  ownerId       String
+  owner         User                @relation("ClassroomOwner", fields: [ownerId], references: [id], onDelete: Cascade)
+  members       ClassMember[]
+  flashcardSets ClassFlashcardSet[]
+
+  @@index([ownerId])
+}
+
+model ClassMember {
+  classroomId String
+  userId      String
+  createdAt   DateTime @default(now())
+
+  classroom Classroom @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([classroomId, userId])
+  @@index([userId])
+}
+
+model ClassFlashcardSet {
+  classroomId    String
+  flashcardSetId String
+
+  classroom    Classroom    @relation(fields: [classroomId], references: [id], onDelete: Cascade)
+  flashcardSet FlashcardSet @relation(fields: [flashcardSetId], references: [id], onDelete: Cascade)
+
+  @@id([classroomId, flashcardSetId])
+  @@index([flashcardSetId])
+}
+
 enum UserRole {
   ADMIN
   USER
 }
 
 enum FlashcardSetVisibility {
+  PRIVATE
   PUBLIC
 }

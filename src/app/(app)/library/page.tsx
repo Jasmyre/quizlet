@@ -1,41 +1,31 @@
-import { notFound } from "next/navigation";
+import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { auth } from "@/auth";
 import { AppSidebar } from "@/components/app-sidebar";
-import { ProfileContent } from "@/components/pages/(app)/user/profile-content";
+import { LibraryContent } from "@/components/pages/(app)/library/library-content";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getUserProfile } from "@/lib/user-profile";
+import { getUserLibrary } from "@/lib/user-library";
 import { HydrateClient } from "@/trpc/server";
 
-const UserPageContent = async ({
-  params,
-}: {
-  params: Promise<{ usernameOrId: string }>;
-}) => {
-  const { usernameOrId } = await params;
+const LibraryPageContent = async () => {
   const session = await auth();
-  const profile = await getUserProfile({
-    usernameOrId,
-    viewerUserId: session?.user?.id,
-  });
+  const userId = session?.user?.id;
 
-  if (!profile) {
-    notFound();
+  if (!userId) {
+    redirect("/auth");
   }
 
-  return <ProfileContent profile={profile} />;
+  const library = await getUserLibrary(userId);
+
+  return <LibraryContent library={library} />;
 };
 
-export default function UserPage({
-  params,
-}: {
-  params: Promise<{ usernameOrId: string }>;
-}) {
+export default function LibraryPage() {
   return (
     <HydrateClient>
       <SidebarProvider>
@@ -52,7 +42,7 @@ export default function UserPage({
           </header>
           <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center">
             <Suspense fallback={<div>Loading...</div>}>
-              <UserPageContent params={params} />
+              <LibraryPageContent />
             </Suspense>
           </main>
         </SidebarInset>

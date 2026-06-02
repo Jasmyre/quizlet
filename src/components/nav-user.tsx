@@ -5,7 +5,9 @@ import {
   ChevronsUpDownIcon,
   LogOutIcon,
   SettingsIcon,
+  User,
 } from "lucide-react";
+import Link from "next/link";
 import { signout } from "@/actions/sign-out";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -27,7 +29,7 @@ import {
 export interface NavUserData {
   avatar: string;
   email: string;
-  name: string;
+  username: string;
 }
 
 export function NavUser({ user }: { user: NavUserData }) {
@@ -47,11 +49,17 @@ export function NavUser({ user }: { user: NavUserData }) {
               size="lg"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage alt={user.name} src={user.avatar} />
-                <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+                <AvatarImage alt={user.username} src={user.avatar} />
+                <AvatarFallback className="rounded-lg">
+                  {user.username
+                    .split(" ")
+                    .map((n) => n[0])
+                    .join("")
+                    .toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
-                <span className="truncate font-medium">{user.name}</span>
+                <span className="truncate font-medium">{user.username}</span>
                 <span className="truncate text-muted-foreground text-xs">
                   {user.email}
                 </span>
@@ -68,11 +76,11 @@ export function NavUser({ user }: { user: NavUserData }) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage alt={user.name} src={user.avatar} />
+                  <AvatarImage alt={user.username} src={user.avatar} />
                   <AvatarFallback className="rounded-lg">CN</AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
-                  <span className="truncate font-medium">{user.name}</span>
+                  <span className="truncate font-medium">{user.username}</span>
                   <span className="truncate text-xs">{user.email}</span>
                 </div>
               </div>
@@ -80,8 +88,12 @@ export function NavUser({ user }: { user: NavUserData }) {
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
               <DropdownMenuItem className="cursor-pointer">
+                <User />
+                <Link href={`/user/${user.username}`}>Profile</Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem className="cursor-pointer">
                 <SettingsIcon />
-                Account Settings
+                Settings
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <BellIcon />

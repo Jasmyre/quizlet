@@ -7,10 +7,12 @@ import {
   GraduationCapIcon,
   MoreHorizontalIcon,
   SearchIcon,
-  UsersIcon,
+  ShareIcon,
+  TrashIcon,
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import { useMemo, useState } from "react";
+import { deleteFlashcardSet } from "@/actions/flashcardset";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -412,7 +414,7 @@ function FlashcardSetCard({ set }: { set: FlashcardSet }) {
           {set.flashcardCount} terms · {VISIBILITY_LABELS[set.visibility]}
         </CardDescription>
         <CardAction>
-          <LibraryItemMenu label={set.title} />
+          <LibraryItemMenu id={set.id} label={set.title} />
         </CardAction>
       </CardHeader>
       <CardContent>
@@ -434,7 +436,7 @@ function FolderCard({ folder }: { folder: Folder }) {
         </CardTitle>
         <CardDescription>{folder.setCount} sets</CardDescription>
         <CardAction>
-          <LibraryItemMenu label={folder.name} />
+          <LibraryItemMenu id={folder.id} label={folder.name} />
         </CardAction>
       </CardHeader>
       <CardContent>
@@ -458,7 +460,7 @@ function ClassCard({ classroom }: { classroom: Classroom }) {
           {classroom.memberCount} members · {classroom.setCount} sets
         </CardDescription>
         <CardAction>
-          <LibraryItemMenu label={classroom.name} />
+          <LibraryItemMenu id={classroom.id} label={classroom.name} />
         </CardAction>
       </CardHeader>
       <CardContent>
@@ -470,7 +472,7 @@ function ClassCard({ classroom }: { classroom: Classroom }) {
   );
 }
 
-function LibraryItemMenu({ label }: { label: string }) {
+function LibraryItemMenu({ label, id }: { label: string; id: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -491,8 +493,15 @@ function LibraryItemMenu({ label }: { label: string }) {
             Open
           </DropdownMenuItem>
           <DropdownMenuItem className="cursor-pointer">
-            <UsersIcon />
+            <ShareIcon />
             Share
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => deleteFlashcardSet(id)}
+          >
+            <TrashIcon />
+            Delete
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />

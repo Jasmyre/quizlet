@@ -347,7 +347,7 @@ function StudySetToolbar({
         </InputGroupAddon>
       </InputGroup>
 
-      <div className="flex flex-nowrap gap-2 lg:ml-auto">
+      <div className="flex flex-wrap gap-2 md:flex-nowrap lg:ml-auto">
         <RadioDropdown<VisibilityValue>
           label={VISIBILITY_LABELS[visibility]}
           onValueChange={onVisibilityChange}

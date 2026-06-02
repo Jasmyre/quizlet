@@ -1,6 +1,6 @@
 import { Cards01Icon } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
-import { Card, CardContent } from "@/components/ui/card";
+import { LibraryItemCard } from "@/components/pages/(app)/shared/library-item-card";
 import { cn } from "@/lib/utils";
 
 interface FlashcardSet {
@@ -70,34 +70,28 @@ export function Recents() {
 
       <div className="grid gap-x-4 gap-y-5 lg:grid-cols-2">
         {recentFlashcardSets.map((set) => (
-          <Card
-            className="cursor-pointer border-0 bg-transparent py-2 text-foreground shadow-none ring-0 hover:bg-muted"
+          <LibraryItemCard
+            icon={
+              <HugeiconsIcon
+                className={cn(
+                  "size-5",
+                  set.kind === "cards" ? "text-cyan-400" : "text-fuchsia-400"
+                )}
+                icon={Cards01Icon}
+                strokeWidth={2}
+              />
+            }
             key={set.id}
-          >
-            <CardContent className="flex items-center gap-4 px-0">
-              <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-muted">
-                <HugeiconsIcon
-                  className={cn(
-                    "size-5",
-                    set.kind === "cards" ? "text-cyan-400" : "text-fuchsia-400"
-                  )}
-                  icon={Cards01Icon}
-                  strokeWidth={2}
-                />
-              </div>
-              <div className="min-w-0">
-                <h2 className="truncate font-semibold text-sm leading-5">
-                  {set.title}
-                </h2>
-                <p className="font-semibold text-muted-foreground text-sm leading-5">
-                  {set.kind === "cards"
-                    ? `${set.termCount} cards`
-                    : "Study guide"}{" "}
-                  <span aria-hidden="true">·</span> by {set.author}
-                </p>
-              </div>
-            </CardContent>
-          </Card>
+            metadata={
+              <>
+                {set.kind === "cards"
+                  ? `${set.termCount} cards`
+                  : "Study guide"}{" "}
+                <span aria-hidden="true">·</span> by {set.author}
+              </>
+            }
+            title={set.title}
+          />
         ))}
       </div>
     </section>

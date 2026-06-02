@@ -1,33 +1,26 @@
 "use client";
 
+import { Cards01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
-  BookmarkIcon,
-  BookOpenIcon,
   CalendarIcon,
   ChevronDownIcon,
   CopyIcon,
-  FlagIcon,
   FolderIcon,
+  GraduationCapIcon,
   MessageSquareWarningIcon,
   MoreHorizontalIcon,
-  PlayIcon,
   SearchIcon,
   ShareIcon,
+  StarIcon,
+  TrashIcon,
   UserPlusIcon,
-  UsersIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
+import { LibraryItemCard } from "@/components/pages/(app)/shared/library-item-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { ButtonGroup } from "@/components/ui/button-group";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,7 +46,6 @@ type FlashcardSet = UserProfile["flashcardSets"][number];
 type FilterValue = "all" | "recent" | "high-score" | "needs-practice";
 type SortValue = "latest" | "score" | "terms";
 type VisibilityValue = "all" | FlashcardSet["visibility"];
-type ViewMode = "list" | "grid";
 
 const SORT_LABELS: Record<SortValue, string> = {
   latest: "Latest",
@@ -72,7 +64,6 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
   const [category, setCategory] = useState("all");
   const [visibility, setVisibility] = useState<VisibilityValue>("all");
   const [sort, setSort] = useState<SortValue>("latest");
-  const [viewMode, setViewMode] = useState<ViewMode>("list");
 
   const categories = useMemo(
     () =>
@@ -149,21 +140,13 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
             onFilterChange={setFilter}
             onQueryChange={setQuery}
             onSortChange={setSort}
-            onViewModeChange={setViewMode}
             onVisibilityChange={setVisibility}
             query={query}
             sort={sort}
-            viewMode={viewMode}
             visibility={visibility}
           />
 
-          <div
-            className={
-              viewMode === "grid"
-                ? "grid min-w-0 gap-3 lg:grid-cols-2"
-                : "flex min-w-0 flex-col gap-5"
-            }
-          >
+          <div className="flex min-w-0 flex-col gap-5">
             {groupedStudySets.map(([sectionLabel, sets]) => (
               <section
                 className="flex min-w-0 flex-col gap-2"
@@ -175,9 +158,13 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
                   </h2>
                   <Separator className="flex-1" />
                 </div>
-                <div className="flex min-w-0 flex-col gap-4">
+                <div className="grid min-w-0 gap-x-4 gap-y-5 lg:grid-cols-1">
                   {sets.map((set) => (
-                    <StudySetRow key={set.id} set={set} />
+                    <StudySetRow
+                      author={profile.username}
+                      key={set.id}
+                      set={set}
+                    />
                   ))}
                 </div>
               </section>
@@ -196,23 +183,25 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
           </div>
         </TabsContent>
 
-        <TabsContent className="grid gap-3 sm:grid-cols-2" value="classes">
+        <TabsContent className="grid gap-3 sm:grid-cols-1" value="classes">
           {profile.classes.map((classroom) => (
-            <LibraryCard
-              description={`${classroom.memberCount} members · ${classroom.setCount} sets`}
-              icon={UsersIcon}
+            <LibraryItemCard
+              action={<ProfileItemAction title={classroom.name} />}
+              icon={<GraduationCapIcon className="size-5 text-emerald-400" />}
               key={classroom.id}
+              metadata={`${classroom.memberCount} members · ${classroom.setCount} sets`}
               title={classroom.name}
             />
           ))}
         </TabsContent>
 
-        <TabsContent className="grid gap-3 sm:grid-cols-2" value="folders">
+        <TabsContent className="grid gap-3 sm:grid-cols-1" value="folders">
           {profile.folders.map((folder) => (
-            <LibraryCard
-              description={`${folder.setCount} sets`}
-              icon={FolderIcon}
+            <LibraryItemCard
+              action={<ProfileItemAction title={folder.name} />}
+              icon={<FolderIcon className="size-5 text-amber-400" />}
               key={folder.id}
+              metadata={`${folder.setCount} sets`}
               title={folder.name}
             />
           ))}
@@ -326,11 +315,9 @@ function StudySetToolbar({
   onFilterChange: (value: FilterValue) => void;
   onQueryChange: (value: string) => void;
   onSortChange: (value: SortValue) => void;
-  onViewModeChange: (value: ViewMode) => void;
   onVisibilityChange: (value: VisibilityValue) => void;
   query: string;
   sort: SortValue;
-  viewMode: ViewMode;
   visibility: VisibilityValue;
 }) {
   return (
@@ -426,36 +413,34 @@ function RadioDropdown<TValue extends string>({
   );
 }
 
-function StudySetRow({ set }: { set: FlashcardSet }) {
+function StudySetRow({ author, set }: { author: string; set: FlashcardSet }) {
   return (
-    <Card className="min-w-0 transition-colors hover:bg-muted/50" size="sm">
-      <CardContent className="flex min-w-0 flex-row justify-between gap-4">
-        <div className="min-w-0">
-          <p className="font-medium text-muted-foreground text-xs">
-            {set.flashcardCount} Terms
-          </p>
-          <h3 className="mb-4 truncate font-heading font-semibold text-base">
-            {set.title}
-          </h3>
-          <p className="flex items-center gap-1.5 text-muted-foreground text-sm">
-            <FolderIcon />
-            {set.description ?? "No description"}
-          </p>
-        </div>
-        <div className="md:self-start">
-          <StudySetActionMenu title={set.title} />
-        </div>
-      </CardContent>
-    </Card>
+    <LibraryItemCard
+      action={<StudySetOptionsMenu title={set.title} />}
+      icon={
+        <HugeiconsIcon
+          className="size-5 text-cyan-400"
+          icon={Cards01Icon}
+          strokeWidth={2}
+        />
+      }
+      metadata={
+        <>
+          {set.flashcardCount} cards <span aria-hidden="true">·</span> by{" "}
+          {author}
+        </>
+      }
+      title={set.title}
+    />
   );
 }
 
-function StudySetActionMenu({ title }: { title: string }) {
+function StudySetOptionsMenu({ title }: { title: string }) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
-          aria-label={`Open actions for ${title}`}
+          aria-label={`Open options for ${title}`}
           size="icon-sm"
           type="button"
           variant="ghost"
@@ -463,31 +448,30 @@ function StudySetActionMenu({ title }: { title: string }) {
           <MoreHorizontalIcon />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Set actions</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="min-w-40 max-w-max">
+        <DropdownMenuLabel>Set options</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
-            <BookOpenIcon />
-            Open set
+          <DropdownMenuItem className="cursor-pointer text-nowrap">
+            <StarIcon />
+            favorite
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <PlayIcon />
-            Practice
-          </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <BookmarkIcon />
-            Save to folder
+          <DropdownMenuItem className="cursor-pointer text-nowrap">
+            <ShareIcon />
+            Share
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
-            <ShareIcon />
-            Share
+          <DropdownMenuItem
+            className="cursor-pointer text-nowrap"
+            variant="destructive"
+          >
+            <TrashIcon />
+            Delete
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
-            <FlagIcon />
-            Report
+          <DropdownMenuItem className="cursor-pointer text-nowrap">
+            <FolderIcon />
+            Organize
           </DropdownMenuItem>
         </DropdownMenuGroup>
       </DropdownMenuContent>
@@ -495,35 +479,16 @@ function StudySetActionMenu({ title }: { title: string }) {
   );
 }
 
-function LibraryCard({
-  description,
-  icon: Icon,
-  title,
-}: {
-  description: string;
-  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
-  title: string;
-}) {
+function ProfileItemAction({ title }: { title: string }) {
   return (
-    <Card size="sm">
-      <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Icon />
-          {title}
-        </CardTitle>
-        <CardDescription>{description}</CardDescription>
-        <CardAction>
-          <Button
-            aria-label={`Open actions for ${title}`}
-            size="icon-sm"
-            type="button"
-            variant="ghost"
-          >
-            <MoreHorizontalIcon />
-          </Button>
-        </CardAction>
-      </CardHeader>
-    </Card>
+    <Button
+      aria-label={`Open actions for ${title}`}
+      size="icon-sm"
+      type="button"
+      variant="ghost"
+    >
+      <MoreHorizontalIcon />
+    </Button>
   );
 }
 

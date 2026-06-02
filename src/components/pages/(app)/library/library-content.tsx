@@ -1,5 +1,7 @@
 "use client";
 
+import { Cards01Icon } from "@hugeicons/core-free-icons";
+import { HugeiconsIcon } from "@hugeicons/react";
 import {
   BookOpenIcon,
   ChevronDownIcon,
@@ -8,20 +10,15 @@ import {
   MoreHorizontalIcon,
   SearchIcon,
   ShareIcon,
+  StarIcon,
   TrashIcon,
 } from "lucide-react";
 import type { ComponentType, SVGProps } from "react";
 import { useMemo, useState } from "react";
 import { deleteFlashcardSet } from "@/actions/flashcardset";
+import { LibraryItemCard } from "@/components/pages/(app)/shared/library-item-card";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardAction,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -197,9 +194,13 @@ export function LibraryContent({ library }: { library: UserLibrary }) {
         <TabsContent className="flex flex-col gap-4" value="sets">
           <ResultSummary count={visibleSets.length} label="flashcard sets" />
           {visibleSets.length > 0 ? (
-            <div className="flex min-w-0 flex-col gap-3">
+            <div className="grid min-w-0 gap-x-4 gap-y-5 lg:grid-cols-1">
               {visibleSets.map((set) => (
-                <FlashcardSetCard key={set.id} set={set} />
+                <FlashcardSetCard
+                  author={library.user.username}
+                  key={set.id}
+                  set={set}
+                />
               ))}
             </div>
           ) : (
@@ -405,74 +406,76 @@ function RadioDropdown<TValue extends string>({
   );
 }
 
-function FlashcardSetCard({ set }: { set: FlashcardSet }) {
+function FlashcardSetCard({
+  author,
+  set,
+}: {
+  author: string;
+  set: FlashcardSet;
+}) {
   return (
-    <Card className="min-w-0 transition-colors hover:bg-muted/50" size="sm">
-      <CardHeader>
-        <CardTitle className="truncate">{set.title}</CardTitle>
-        <CardDescription>
-          {set.flashcardCount} terms · {VISIBILITY_LABELS[set.visibility]}
-        </CardDescription>
-        <CardAction>
-          <LibraryItemMenu id={set.id} label={set.title} />
-        </CardAction>
-      </CardHeader>
-      <CardContent>
-        <p className="line-clamp-2 text-muted-foreground">
-          {set.description ?? "No description"}
-        </p>
-      </CardContent>
-    </Card>
+    <LibraryItemCard
+      action={
+        <LibraryItemMenu
+          label={set.title}
+          onDelete={() => deleteFlashcardSet(set.id)}
+        />
+      }
+      icon={
+        <HugeiconsIcon
+          className="size-5 text-cyan-400"
+          icon={Cards01Icon}
+          strokeWidth={2}
+        />
+      }
+      metadata={
+        <>
+          {set.flashcardCount} cards <span aria-hidden="true">·</span> by{" "}
+          {author}
+        </>
+      }
+      title={set.title}
+    />
   );
 }
 
 function FolderCard({ folder }: { folder: Folder }) {
   return (
-    <Card className="min-w-0 transition-colors hover:bg-muted/50" size="sm">
-      <CardHeader>
-        <CardTitle className="flex min-w-0 items-center gap-2">
-          <FolderIcon />
-          <span className="truncate">{folder.name}</span>
-        </CardTitle>
-        <CardDescription>{folder.setCount} sets</CardDescription>
-        <CardAction>
-          <LibraryItemMenu id={folder.id} label={folder.name} />
-        </CardAction>
-      </CardHeader>
-      <CardContent>
-        <p className="line-clamp-2 text-muted-foreground">
-          {folder.description ?? "No description"}
-        </p>
-      </CardContent>
-    </Card>
+    <LibraryItemCard
+      action={<LibraryItemMenu label={folder.name} />}
+      description={folder.description ?? "No description"}
+      icon={<FolderIcon className="size-5 text-amber-400" />}
+      metadata={`${folder.setCount} sets`}
+      title={folder.name}
+    />
   );
 }
 
 function ClassCard({ classroom }: { classroom: Classroom }) {
   return (
-    <Card className="min-w-0 transition-colors hover:bg-muted/50" size="sm">
-      <CardHeader>
-        <CardTitle className="flex min-w-0 items-center gap-2">
-          <GraduationCapIcon />
-          <span className="truncate">{classroom.name}</span>
-        </CardTitle>
-        <CardDescription>
+    <LibraryItemCard
+      action={<LibraryItemMenu label={classroom.name} />}
+      description={
+        classroom.description ?? `${capitalize(classroom.role)} class`
+      }
+      icon={<GraduationCapIcon className="size-5 text-emerald-400" />}
+      metadata={
+        <>
           {classroom.memberCount} members · {classroom.setCount} sets
-        </CardDescription>
-        <CardAction>
-          <LibraryItemMenu id={classroom.id} label={classroom.name} />
-        </CardAction>
-      </CardHeader>
-      <CardContent>
-        <p className="line-clamp-2 text-muted-foreground">
-          {classroom.description ?? `${capitalize(classroom.role)} class`}
-        </p>
-      </CardContent>
-    </Card>
+        </>
+      }
+      title={classroom.name}
+    />
   );
 }
 
-function LibraryItemMenu({ label, id }: { label: string; id: string }) {
+function LibraryItemMenu({
+  label,
+  onDelete,
+}: {
+  label: string;
+  onDelete?: () => void;
+}) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -485,28 +488,29 @@ function LibraryItemMenu({ label, id }: { label: string; id: string }) {
           <MoreHorizontalIcon />
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end">
-        <DropdownMenuLabel>Library actions</DropdownMenuLabel>
+      <DropdownMenuContent align="end" className="min-w-40 max-w-max">
+        <DropdownMenuLabel>Item options</DropdownMenuLabel>
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
-            <BookOpenIcon />
-            Open
+          <DropdownMenuItem className="cursor-pointer text-nowrap">
+            <StarIcon />
+            favorite
           </DropdownMenuItem>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem className="cursor-pointer text-nowrap">
             <ShareIcon />
             Share
-          </DropdownMenuItem>
-          <DropdownMenuItem
-            className="cursor-pointer"
-            onClick={() => deleteFlashcardSet(id)}
-          >
-            <TrashIcon />
-            Delete
           </DropdownMenuItem>
         </DropdownMenuGroup>
         <DropdownMenuSeparator />
         <DropdownMenuGroup>
-          <DropdownMenuItem className="cursor-pointer">
+          <DropdownMenuItem
+            className="cursor-pointer text-nowrap"
+            onClick={onDelete}
+            variant="destructive"
+          >
+            <TrashIcon />
+            Delete
+          </DropdownMenuItem>
+          <DropdownMenuItem className="cursor-pointer text-nowrap">
             <FolderIcon />
             Organize
           </DropdownMenuItem>

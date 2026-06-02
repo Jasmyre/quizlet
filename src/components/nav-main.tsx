@@ -251,7 +251,8 @@ export function NavMain({ items }: { items: NavMainItem[] }) {
           <SidebarMenuItem>
             <SidebarMenuButton
               asChild
-              className="bg-accent hover:bg-accent/70"
+              className="hover:bg-accent/70 data-[active=true]:bg-accent"
+              isActive={isCurrentPath("/flashcards/create")}
               tooltip="Create flashcards"
             >
               <Link href={"/flashcards/create"}>

@@ -195,7 +195,7 @@ export function LibraryContent({ library }: { library: UserLibrary }) {
         <TabsContent className="flex flex-col gap-4" value="sets">
           <ResultSummary count={visibleSets.length} label="flashcard sets" />
           {visibleSets.length > 0 ? (
-            <div className="grid min-w-0 gap-3 lg:grid-cols-2">
+            <div className="flex min-w-0 flex-col gap-3">
               {visibleSets.map((set) => (
                 <FlashcardSetCard key={set.id} set={set} />
               ))}
@@ -250,7 +250,7 @@ export function LibraryContent({ library }: { library: UserLibrary }) {
 function LibraryHeader({ library }: { library: UserLibrary }) {
   return (
     <section className="flex min-w-0 flex-col gap-4">
-      <div className="flex min-w-0 flex-col justify-between gap-4 md:flex-row md:items-end">
+      <div className="flex min-w-0 flex-row items-end justify-between gap-4">
         <div className="flex min-w-0 flex-col gap-1">
           <h1 className="font-heading font-semibold text-2xl tracking-normal">
             Your library
@@ -259,25 +259,9 @@ function LibraryHeader({ library }: { library: UserLibrary }) {
             Study sets, folders, and classes saved for {library.user.username}.
           </p>
         </div>
-        <div className="grid grid-cols-3 gap-2 text-sm md:min-w-80">
-          <StatCard label="Sets" value={library.stats.flashcardSets} />
-          <StatCard label="Folders" value={library.stats.folders} />
-          <StatCard label="Classes" value={library.stats.classes} />
-        </div>
       </div>
       <Separator />
     </section>
-  );
-}
-
-function StatCard({ label, value }: { label: string; value: number }) {
-  return (
-    <Card className="rounded-lg" size="sm">
-      <CardContent className="flex flex-col gap-1">
-        <span className="font-heading font-semibold text-lg">{value}</span>
-        <span className="text-muted-foreground text-xs">{label}</span>
-      </CardContent>
-    </Card>
   );
 }
 
@@ -307,9 +291,7 @@ function LibraryToolbar({
   visibility: VisibilityValue;
 }) {
   const searchPlaceholder =
-    activeTab === "sets"
-      ? "Search flashcard sets"
-      : `Search ${activeTab}`;
+    activeTab === "sets" ? "Search flashcard sets" : `Search ${activeTab}`;
 
   return (
     <div className="flex flex-col gap-3 lg:flex-row lg:items-center">

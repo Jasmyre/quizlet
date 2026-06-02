@@ -1,29 +1,12 @@
-import { redirect } from "next/navigation";
-import { Suspense } from "react";
-import { auth } from "@/auth";
 import { AppSidebar } from "@/components/app-sidebar";
-import { LibraryContent } from "@/components/pages/(app)/library/library-content";
+import { LibraryPageContent } from "@/components/pages/(app)/library/library-page-content";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getUserLibrary } from "@/lib/user-library";
 import { HydrateClient } from "@/trpc/server";
-
-const LibraryPageContent = async () => {
-  const session = await auth();
-  const userId = session?.user?.id;
-
-  if (!userId) {
-    redirect("/auth");
-  }
-
-  const library = await getUserLibrary(userId);
-
-  return <LibraryContent library={library} />;
-};
 
 export default function LibraryPage() {
   return (
@@ -41,9 +24,7 @@ export default function LibraryPage() {
             </div>
           </header>
           <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center">
-            <Suspense fallback={<div>Loading...</div>}>
-              <LibraryPageContent />
-            </Suspense>
+            <LibraryPageContent />
           </main>
         </SidebarInset>
       </SidebarProvider>

@@ -1,8 +1,10 @@
 "use server";
 
 import type * as z from "zod";
+import { updateTag } from "next/cache";
 import { auth } from "@/auth";
 import { flashcardSetVisibilityByFormValue } from "@/lib/flashcard-set-visibility";
+import { getUserLibraryCacheTag } from "@/lib/user-library";
 import { createFlashcardSetSchema } from "@/schemas/flashcard-set-schema";
 import { db } from "@/server/db";
 
@@ -56,6 +58,8 @@ export const createFlashcardSet = async (
         id: true,
       },
     });
+
+    updateTag(getUserLibraryCacheTag(userId));
 
     return {
       success: "Flashcard set created.",

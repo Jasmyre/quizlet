@@ -128,9 +128,11 @@ export function NavUser({ user }: { user: NavUserData }) {
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem className="cursor-pointer">
-                <User />
-                <Link href={`/user/${user.username}`}>Profile</Link>
+              <DropdownMenuItem asChild className="cursor-pointer">
+                <Link href={`/user/${user.username}`}>
+                  <User />
+                  Profile
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem className="cursor-pointer">
                 <SettingsIcon />

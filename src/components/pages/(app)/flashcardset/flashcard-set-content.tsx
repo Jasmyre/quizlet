@@ -17,6 +17,7 @@ import type { FlashcardSetDetail } from "@/schemas/flashcard-set-detail-schema";
 const SWIPE_THRESHOLD = 96;
 const DRAG_CLICK_THRESHOLD = 8;
 const SWIPE_ANIMATION_DURATION_MS = 300;
+const FLIP_ANIMATION_DURATION_MS = 500;
 const EXIT_ROTATION_DEGREES = 16;
 
 const deckDepthLevels = [
@@ -109,6 +110,28 @@ export function FlashcardSetContent({
       )}
     </div>
   );
+}
+
+function buildCardTransform({
+  swipePhase,
+  exitDirection,
+  dragOffset,
+  isFlipped,
+}: {
+  swipePhase: SwipePhase;
+  exitDirection: SwipeDirection | null;
+  dragOffset: number;
+  isFlipped: boolean;
+}): string {
+  const flip = isFlipped ? " rotateY(180deg)" : "";
+
+  if (swipePhase === "exiting" && exitDirection !== null) {
+    return `translateX(calc(${exitDirection * 100}% + ${
+      exitDirection * 8
+    }rem)) rotate(${exitDirection * EXIT_ROTATION_DEGREES}deg)${flip}`;
+  }
+
+  return `translateX(${dragOffset}px) rotate(${dragOffset / 24}deg)${flip}`;
 }
 
 function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
@@ -227,6 +250,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
   const handleCardTransitionEnd = (
     event: React.TransitionEvent<HTMLButtonElement>
   ): void => {
+    // Look for the primary structural layout transformation
     if (
       event.propertyName !== "transform" ||
       event.currentTarget !== event.target
@@ -243,8 +267,9 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
       return;
     }
 
-    setActiveIndex(targetIndex);
+    // Single-tick batched state reset to guarantee pristine mounting
     setIsFlipped(false);
+    setActiveIndex(targetIndex);
     setDragOffset(0);
     setDragStartX(null);
     setExitDirection(null);
@@ -253,17 +278,17 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
     hasDraggedRef.current = false;
   };
 
-  const activeCardTransform =
-    swipePhase === "exiting" && exitDirection !== null
-      ? `translateX(calc(${exitDirection * 100}% + ${
-          exitDirection * 8
-        }rem)) rotate(${exitDirection * EXIT_ROTATION_DEGREES}deg)`
-      : `translateX(${dragOffset}px) rotate(${dragOffset / 24}deg)`;
+  const activeCardTransform = buildCardTransform({
+    swipePhase,
+    exitDirection,
+    dragOffset,
+    isFlipped,
+  });
 
   const transitionDuration = isDragging
     ? "0ms"
     : swipePhase === "idle"
-      ? "0ms"
+      ? `${FLIP_ANIMATION_DURATION_MS}ms`
       : `${SWIPE_ANIMATION_DURATION_MS}ms`;
 
   const previewDirection =
@@ -273,12 +298,14 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
       : dragOffset >= DRAG_CLICK_THRESHOLD
         ? 1
         : null);
+
   const previewCard =
     flashcards[
       previewDirection === null
         ? wrapCardIndex(activeIndex + 1)
         : getTargetIndexForExit(previewDirection)
     ];
+
   const depthTransitionDuration = isExiting
     ? `${SWIPE_ANIMATION_DURATION_MS}ms`
     : "0ms";
@@ -312,6 +339,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
           className="relative h-[20rem] min-w-0 flex-1 overflow-visible sm:h-[28rem]"
           style={{ perspective: "1000px" }}
         >
+          {/* Depth Deck Stack */}
           {deckDepthCards.map((depthCard, index) => {
             const level =
               deckDepthLevels[
@@ -352,7 +380,10 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
               </div>
             );
           })}
+
+          {/* Active Flashcard (Key moved here to force pristine element swapping) */}
           <button
+            key={activeIndex}
             aria-label={
               isFlipped
                 ? "Show the flashcard term"
@@ -371,17 +402,15 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
             onTransitionEnd={handleCardTransitionEnd}
             style={{
               transform: activeCardTransform,
+              transformStyle: "preserve-3d",
               transitionDuration,
               zIndex: 3,
             }}
             type="button"
           >
             <div
-              className="relative size-full rounded-xl transition-transform duration-500 ease-out"
-              style={{
-                transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
-                transformStyle: "preserve-3d",
-              }}
+              className="relative size-full rounded-xl"
+              style={{ transformStyle: "preserve-3d" }}
             >
               <FlashcardFace
                 eyebrow="Term"

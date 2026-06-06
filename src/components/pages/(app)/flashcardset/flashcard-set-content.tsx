@@ -16,25 +16,49 @@ import type { FlashcardSetDetail } from "@/schemas/flashcard-set-detail-schema";
 
 const SWIPE_THRESHOLD = 96;
 const DRAG_CLICK_THRESHOLD = 8;
+const SWIPE_ANIMATION_DURATION_MS = 300;
 const EXIT_ROTATION_DEGREES = 16;
 
-const deckDepthCards = [
+const deckDepthLevels = [
+  {
+    opacity: 1,
+    transform: "translateY(0) scale(1)",
+    zIndex: 2,
+  },
   {
     opacity: 0.82,
     transform: "translateY(10px) scale(0.96)",
-    zIndex: 2,
+    zIndex: 1,
   },
   {
     opacity: 0.56,
     transform: "translateY(20px) scale(0.92)",
-    zIndex: 1,
+    zIndex: 0,
   },
   {
     opacity: 0.34,
     transform: "translateY(30px) scale(0.88)",
-    zIndex: 0,
+    zIndex: -1,
   },
 ] as const;
+
+const deckDepthCards = [
+  {
+    idleLevel: 1,
+    promotedLevel: 0,
+  },
+  {
+    idleLevel: 2,
+    promotedLevel: 1,
+  },
+  {
+    idleLevel: 3,
+    promotedLevel: 2,
+  },
+] as const satisfies {
+  idleLevel: 1 | 2 | 3;
+  promotedLevel: 0 | 1 | 2;
+}[];
 
 type Flashcard = FlashcardSetDetail["flashcards"][number];
 type SwipePhase = "idle" | "returning" | "exiting";
@@ -110,23 +134,26 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
   const wrapCardIndex = (nextIndex: number): number =>
     (nextIndex + flashcards.length) % flashcards.length;
 
+  const getTargetIndexForExit = (direction: SwipeDirection): number =>
+    wrapCardIndex(activeIndex - direction);
+
   const startCardExit = (direction: SwipeDirection): void => {
     if (isExiting) {
       return;
     }
 
-    setTargetIndex(wrapCardIndex(activeIndex + direction));
+    setTargetIndex(getTargetIndexForExit(direction));
     setExitDirection(direction);
     setDragStartX(null);
     setSwipePhase("exiting");
   };
 
   const showPreviousCard = (): void => {
-    startCardExit(-1);
+    startCardExit(1);
   };
 
   const showNextCard = (): void => {
-    startCardExit(1);
+    startCardExit(-1);
   };
 
   const handlePointerDown = (
@@ -170,12 +197,12 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
     }
 
     if (dragOffset <= -SWIPE_THRESHOLD) {
-      startCardExit(1);
+      startCardExit(-1);
       return;
     }
 
     if (dragOffset >= SWIPE_THRESHOLD) {
-      startCardExit(-1);
+      startCardExit(1);
       return;
     }
 
@@ -237,7 +264,24 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
     ? "0ms"
     : swipePhase === "idle"
       ? "0ms"
-      : "300ms";
+      : `${SWIPE_ANIMATION_DURATION_MS}ms`;
+
+  const previewDirection =
+    exitDirection ??
+    (dragOffset <= -DRAG_CLICK_THRESHOLD
+      ? -1
+      : dragOffset >= DRAG_CLICK_THRESHOLD
+        ? 1
+        : null);
+  const previewCard =
+    flashcards[
+      previewDirection === null
+        ? wrapCardIndex(activeIndex + 1)
+        : getTargetIndexForExit(previewDirection)
+    ];
+  const depthTransitionDuration = isExiting
+    ? `${SWIPE_ANIMATION_DURATION_MS}ms`
+    : "0ms";
 
   return (
     <section className="flex min-w-0 flex-col gap-4 overflow-x-clip px-1 pb-8">
@@ -268,25 +312,46 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
           className="relative h-[20rem] min-w-0 flex-1 overflow-visible sm:h-[28rem]"
           style={{ perspective: "1000px" }}
         >
-          {deckDepthCards.map((depthCard, index) => (
-            <div
-              aria-hidden="true"
-              className="pointer-events-none absolute inset-0 rounded-xl border bg-card shadow-sm"
-              key={depthCard.transform}
-              style={{
-                opacity: depthCard.opacity,
-                transform: depthCard.transform,
-                zIndex: depthCard.zIndex,
-              }}
-            >
+          {deckDepthCards.map((depthCard, index) => {
+            const level =
+              deckDepthLevels[
+                isExiting ? depthCard.promotedLevel : depthCard.idleLevel
+              ];
+
+            return (
               <div
-                className={cn(
-                  "absolute inset-x-6 h-px rounded-full bg-border/70",
-                  index === 0 ? "top-6" : "top-5"
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 overflow-hidden rounded-xl border bg-card shadow-sm transition-[opacity,transform] ease-out"
+                key={`${depthCard.idleLevel}-${depthCard.promotedLevel}`}
+                style={{
+                  opacity: level.opacity,
+                  transform: level.transform,
+                  transitionDuration: depthTransitionDuration,
+                  zIndex: level.zIndex,
+                }}
+              >
+                {index === 0 && previewCard ? (
+                  <div
+                    className="relative size-full rounded-xl"
+                    style={{ transformStyle: "preserve-3d" }}
+                  >
+                    <FlashcardFace
+                      eyebrow="Term"
+                      text={previewCard.term}
+                      visibleSide="front"
+                    />
+                  </div>
+                ) : (
+                  <div
+                    className={cn(
+                      "absolute inset-x-6 h-px rounded-full bg-border/70",
+                      index === 1 ? "top-6" : "top-5"
+                    )}
+                  />
                 )}
-              />
-            </div>
-          ))}
+              </div>
+            );
+          })}
           <button
             aria-label={
               isFlipped

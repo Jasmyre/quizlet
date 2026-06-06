@@ -16,8 +16,29 @@ import type { FlashcardSetDetail } from "@/schemas/flashcard-set-detail-schema";
 
 const SWIPE_THRESHOLD = 96;
 const DRAG_CLICK_THRESHOLD = 8;
+const EXIT_ROTATION_DEGREES = 16;
+
+const deckDepthCards = [
+  {
+    opacity: 0.82,
+    transform: "translateY(10px) scale(0.96)",
+    zIndex: 2,
+  },
+  {
+    opacity: 0.56,
+    transform: "translateY(20px) scale(0.92)",
+    zIndex: 1,
+  },
+  {
+    opacity: 0.34,
+    transform: "translateY(30px) scale(0.88)",
+    zIndex: 0,
+  },
+] as const;
 
 type Flashcard = FlashcardSetDetail["flashcards"][number];
+type SwipePhase = "idle" | "returning" | "exiting";
+type SwipeDirection = -1 | 1;
 
 export function FlashcardSetContent({
   flashcardSet,
@@ -71,36 +92,54 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
   const [isFlipped, setIsFlipped] = useState(false);
   const [dragStartX, setDragStartX] = useState<number | null>(null);
   const [dragOffset, setDragOffset] = useState(0);
+  const [swipePhase, setSwipePhase] = useState<SwipePhase>("idle");
+  const [exitDirection, setExitDirection] = useState<SwipeDirection | null>(
+    null
+  );
+  const [targetIndex, setTargetIndex] = useState<number | null>(null);
   const hasDraggedRef = useRef(false);
   const activeCard = flashcards[activeIndex];
   const progressLabel = `${activeIndex + 1} / ${flashcards.length}`;
   const isDragging = dragStartX !== null;
+  const isExiting = swipePhase === "exiting";
 
   if (!activeCard) {
     return null;
   }
 
-  const showCard = (nextIndex: number): void => {
-    setActiveIndex((nextIndex + flashcards.length) % flashcards.length);
-    setIsFlipped(false);
-    setDragOffset(0);
+  const wrapCardIndex = (nextIndex: number): number =>
+    (nextIndex + flashcards.length) % flashcards.length;
+
+  const startCardExit = (direction: SwipeDirection): void => {
+    if (isExiting) {
+      return;
+    }
+
+    setTargetIndex(wrapCardIndex(activeIndex + direction));
+    setExitDirection(direction);
     setDragStartX(null);
+    setSwipePhase("exiting");
   };
 
   const showPreviousCard = (): void => {
-    showCard(activeIndex - 1);
+    startCardExit(-1);
   };
 
   const showNextCard = (): void => {
-    showCard(activeIndex + 1);
+    startCardExit(1);
   };
 
   const handlePointerDown = (
     event: React.PointerEvent<HTMLButtonElement>
   ): void => {
+    if (isExiting) {
+      return;
+    }
+
     event.currentTarget.setPointerCapture(event.pointerId);
     setDragStartX(event.clientX);
     setDragOffset(0);
+    setSwipePhase("idle");
     hasDraggedRef.current = false;
   };
 
@@ -126,23 +165,30 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
       return;
     }
 
-    event.currentTarget.releasePointerCapture(event.pointerId);
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
 
     if (dragOffset <= -SWIPE_THRESHOLD) {
-      showNextCard();
+      startCardExit(1);
       return;
     }
 
     if (dragOffset >= SWIPE_THRESHOLD) {
-      showPreviousCard();
+      startCardExit(-1);
       return;
     }
 
     setDragStartX(null);
     setDragOffset(0);
+    setSwipePhase(dragOffset === 0 ? "idle" : "returning");
   };
 
   const handleCardClick = (): void => {
+    if (isExiting) {
+      return;
+    }
+
     if (hasDraggedRef.current) {
       hasDraggedRef.current = false;
       return;
@@ -151,8 +197,50 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
     setIsFlipped((currentValue) => !currentValue);
   };
 
+  const handleCardTransitionEnd = (
+    event: React.TransitionEvent<HTMLButtonElement>
+  ): void => {
+    if (
+      event.propertyName !== "transform" ||
+      event.currentTarget !== event.target
+    ) {
+      return;
+    }
+
+    if (swipePhase === "returning") {
+      setSwipePhase("idle");
+      return;
+    }
+
+    if (swipePhase !== "exiting" || targetIndex === null) {
+      return;
+    }
+
+    setActiveIndex(targetIndex);
+    setIsFlipped(false);
+    setDragOffset(0);
+    setDragStartX(null);
+    setExitDirection(null);
+    setTargetIndex(null);
+    setSwipePhase("idle");
+    hasDraggedRef.current = false;
+  };
+
+  const activeCardTransform =
+    swipePhase === "exiting" && exitDirection !== null
+      ? `translateX(calc(${exitDirection * 100}% + ${
+          exitDirection * 8
+        }rem)) rotate(${exitDirection * EXIT_ROTATION_DEGREES}deg)`
+      : `translateX(${dragOffset}px) rotate(${dragOffset / 24}deg)`;
+
+  const transitionDuration = isDragging
+    ? "0ms"
+    : swipePhase === "idle"
+      ? "0ms"
+      : "300ms";
+
   return (
-    <section className="flex min-w-0 flex-col gap-4">
+    <section className="flex min-w-0 flex-col gap-4 overflow-x-clip px-1 pb-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <RotateCcwIcon className="size-4" />
@@ -163,10 +251,11 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
         </span>
       </div>
 
-      <div className="flex min-w-0 items-center gap-3">
+      <div className="flex min-w-0 items-center gap-3 overflow-x-clip py-2">
         <Button
           aria-label="Show previous flashcard"
           className="hidden sm:inline-flex"
+          disabled={isExiting}
           onClick={showPreviousCard}
           size="icon-lg"
           type="button"
@@ -175,7 +264,29 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
           <ChevronLeftIcon />
         </Button>
 
-        <div className="perspective-distant min-w-0 flex-1">
+        <div
+          className="relative h-[20rem] min-w-0 flex-1 overflow-visible sm:h-[28rem]"
+          style={{ perspective: "1000px" }}
+        >
+          {deckDepthCards.map((depthCard, index) => (
+            <div
+              aria-hidden="true"
+              className="pointer-events-none absolute inset-0 rounded-xl border bg-card shadow-sm"
+              key={depthCard.transform}
+              style={{
+                opacity: depthCard.opacity,
+                transform: depthCard.transform,
+                zIndex: depthCard.zIndex,
+              }}
+            >
+              <div
+                className={cn(
+                  "absolute inset-x-6 h-px rounded-full bg-border/70",
+                  index === 0 ? "top-6" : "top-5"
+                )}
+              />
+            </div>
+          ))}
           <button
             aria-label={
               isFlipped
@@ -183,7 +294,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
                 : "Show the flashcard definition"
             }
             className={cn(
-              "group relative grid min-h-80 w-full touch-pan-y select-none place-items-center rounded-xl border bg-card p-0 text-left shadow-sm outline-none transition-[box-shadow,transform] duration-200 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 sm:min-h-104",
+              "group absolute inset-0 grid touch-pan-y select-none place-items-center rounded-xl border bg-card p-0 text-left shadow-sm outline-none transition-[box-shadow,transform] ease-out focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50",
               isDragging ? "cursor-grabbing" : "cursor-pointer",
               "hover:shadow-md"
             )}
@@ -192,17 +303,20 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
             onPointerDown={handlePointerDown}
             onPointerMove={handlePointerMove}
             onPointerUp={handlePointerEnd}
+            onTransitionEnd={handleCardTransitionEnd}
             style={{
-              transform: `translateX(${dragOffset}px) rotate(${dragOffset / 24}deg)`,
-              transitionDuration: isDragging ? "0ms" : undefined,
+              transform: activeCardTransform,
+              transitionDuration,
+              zIndex: 3,
             }}
             type="button"
           >
             <div
-              className={cn(
-                "transform-3d relative size-full min-h-80 transition-transform duration-500 sm:min-h-104",
-                isFlipped ? "transform-[rotateY(180deg)]" : ""
-              )}
+              className="relative size-full rounded-xl transition-transform duration-500 ease-out"
+              style={{
+                transform: isFlipped ? "rotateY(180deg)" : "rotateY(0deg)",
+                transformStyle: "preserve-3d",
+              }}
             >
               <FlashcardFace
                 eyebrow="Term"
@@ -221,6 +335,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
         <Button
           aria-label="Show next flashcard"
           className="hidden sm:inline-flex"
+          disabled={isExiting}
           onClick={showNextCard}
           size="icon-lg"
           type="button"
@@ -231,11 +346,21 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
       </div>
 
       <div className="grid grid-cols-2 gap-2 sm:hidden">
-        <Button onClick={showPreviousCard} type="button" variant="outline">
+        <Button
+          disabled={isExiting}
+          onClick={showPreviousCard}
+          type="button"
+          variant="outline"
+        >
           <ChevronLeftIcon data-icon="inline-start" />
           Previous
         </Button>
-        <Button onClick={showNextCard} type="button" variant="outline">
+        <Button
+          disabled={isExiting}
+          onClick={showNextCard}
+          type="button"
+          variant="outline"
+        >
           Next
           <ChevronRightIcon data-icon="inline-end" />
         </Button>
@@ -255,22 +380,25 @@ function FlashcardFace({
 }) {
   return (
     <div
-      className={cn(
-        "backface-hidden absolute inset-0 flex flex-col justify-between gap-6 rounded-xl p-6 sm:p-8",
-        visibleSide === "back" ? "transform-[rotateY(180deg)]" : ""
-      )}
+      className="absolute inset-0 flex overflow-hidden rounded-xl bg-card p-6 text-card-foreground sm:p-8"
+      style={{
+        backfaceVisibility: "hidden",
+        transform: visibleSide === "back" ? "rotateY(180deg)" : "rotateY(0deg)",
+      }}
     >
-      <CardHeader className="px-0">
-        <CardDescription>{eyebrow}</CardDescription>
-      </CardHeader>
-      <CardContent className="grid flex-1 place-items-center px-0 text-center">
-        <CardTitle className="max-w-3xl text-balance text-2xl leading-tight sm:text-4xl">
-          {text}
-        </CardTitle>
-      </CardContent>
-      <p className="text-center text-muted-foreground text-sm">
-        Click to {visibleSide === "front" ? "show definition" : "show term"}
-      </p>
+      <div className="flex size-full flex-col justify-between gap-6">
+        <CardHeader className="px-0">
+          <CardDescription>{eyebrow}</CardDescription>
+        </CardHeader>
+        <CardContent className="grid min-h-0 flex-1 place-items-center overflow-y-auto px-0 text-center">
+          <CardTitle className="max-w-3xl text-balance text-2xl leading-tight sm:text-4xl">
+            {text}
+          </CardTitle>
+        </CardContent>
+        <p className="text-center text-muted-foreground text-sm">
+          Click to {visibleSide === "front" ? "show definition" : "show term"}
+        </p>
+      </div>
     </div>
   );
 }

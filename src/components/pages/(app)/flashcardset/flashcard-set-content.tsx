@@ -175,7 +175,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
           <ChevronLeftIcon />
         </Button>
 
-        <div className="min-w-0 flex-1 [perspective:1200px]">
+        <div className="perspective-distant min-w-0 flex-1">
           <button
             aria-label={
               isFlipped
@@ -183,7 +183,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
                 : "Show the flashcard definition"
             }
             className={cn(
-              "group relative grid min-h-[20rem] w-full touch-pan-y select-none place-items-center rounded-xl border bg-card p-0 text-left shadow-sm outline-none transition-[box-shadow,transform] duration-200 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 sm:min-h-[26rem]",
+              "group relative grid min-h-80 w-full touch-pan-y select-none place-items-center rounded-xl border bg-card p-0 text-left shadow-sm outline-none transition-[box-shadow,transform] duration-200 focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 sm:min-h-104",
               isDragging ? "cursor-grabbing" : "cursor-pointer",
               "hover:shadow-md"
             )}
@@ -200,8 +200,8 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
           >
             <div
               className={cn(
-                "relative size-full min-h-[20rem] transition-transform duration-500 [transform-style:preserve-3d] sm:min-h-[26rem]",
-                isFlipped ? "[transform:rotateY(180deg)]" : ""
+                "transform-3d relative size-full min-h-80 transition-transform duration-500 sm:min-h-104",
+                isFlipped ? "transform-[rotateY(180deg)]" : ""
               )}
             >
               <FlashcardFace
@@ -256,8 +256,8 @@ function FlashcardFace({
   return (
     <div
       className={cn(
-        "absolute inset-0 flex flex-col justify-between gap-6 rounded-xl p-6 [backface-visibility:hidden] sm:p-8",
-        visibleSide === "back" ? "[transform:rotateY(180deg)]" : ""
+        "backface-hidden absolute inset-0 flex flex-col justify-between gap-6 rounded-xl p-6 sm:p-8",
+        visibleSide === "back" ? "transform-[rotateY(180deg)]" : ""
       )}
     >
       <CardHeader className="px-0">

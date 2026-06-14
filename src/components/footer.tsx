@@ -58,12 +58,16 @@ interface FooterSectionProps {
   links?: Links[];
 }
 
+// biome-ignore lint/suspicious/useAwait: cache component should be an async function
 const legalSpan = async () => {
   "use cache";
 
   return (
-    <span className="order-last block text-center text-muted-foreground text-sm md:order-first">
-      © {await new Date().getFullYear()} Jasmyre, All rights reserved
+    <span
+      className="order-last block text-center text-muted-foreground text-sm md:order-first"
+      suppressHydrationWarning
+    >
+      © {new Date().getFullYear()} Jasmyre, All rights reserved
     </span>
   );
 };

@@ -2,13 +2,11 @@
 
 import { AuthError } from "next-auth";
 import type * as z from "zod";
-import { signIn } from "@/auth";
+import { auth, signIn } from "@/auth";
 import { DEFAULT_LOGIN_REDIRECT } from "@/routes";
 import { LogInSchema } from "@/schemas/auth-schema";
 
-export const login = async (
-  values: z.infer<typeof LogInSchema>
-): Promise<
+type LoginReturnType = Promise<
   | {
       error: string;
       success?: undefined;
@@ -18,7 +16,16 @@ export const login = async (
       success: string;
       error?: undefined;
     }
-> => {
+>;
+
+export const login = async (
+  values: z.infer<typeof LogInSchema>
+): LoginReturnType => {
+  const session = await auth();
+  if (session) {
+    return { error: "You are already logged in!" };
+  }
+
   const validatedFields = LogInSchema.safeParse(values);
 
   if (!validatedFields.success) {

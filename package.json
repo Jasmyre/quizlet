@@ -67,7 +67,8 @@
     "start": "next start",
     "typecheck": "tsc --noEmit",
     "fix": "ultracite fix",
-    "doctor": "npx react-doctor@latest"
+    "doctor": "npx react-doctor@latest",
+    "doctor:verbose": "npx react-doctor@latest --verbose"
   },
   "type": "module",
   "version": "0.1.0",

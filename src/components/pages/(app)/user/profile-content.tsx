@@ -188,6 +188,8 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
             <LibraryItemCard
               action={<ProfileItemAction title={classroom.name} />}
               icon={<GraduationCapIcon className="size-5 text-emerald-400" />}
+              itemId={classroom.id}
+              itemType="classroom"
               key={classroom.id}
               metadata={`${classroom.memberCount} members · ${classroom.setCount} sets`}
               title={classroom.name}
@@ -200,6 +202,8 @@ export function ProfileContent({ profile }: { profile: UserProfile }) {
             <LibraryItemCard
               action={<ProfileItemAction title={folder.name} />}
               icon={<FolderIcon className="size-5 text-amber-400" />}
+              itemId={folder.id}
+              itemType="folder"
               key={folder.id}
               metadata={`${folder.setCount} sets`}
               title={folder.name}
@@ -424,6 +428,8 @@ function StudySetRow({ author, set }: { author: string; set: FlashcardSet }) {
           strokeWidth={2}
         />
       }
+      itemId={set.id}
+      itemType="flashcardset"
       metadata={
         <>
           {set.flashcardCount} cards <span aria-hidden="true">·</span> by{" "}

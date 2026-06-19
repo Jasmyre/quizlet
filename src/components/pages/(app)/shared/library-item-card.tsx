@@ -37,7 +37,7 @@ export function LibraryItemCard({
             {icon}
           </div>
           <div className="min-w-0 flex-1">
-            <h2 className="truncate font-semibold text-sm leading-5">
+            <h2 className="line-clamp-1 font-semibold text-sm leading-5">
               {title}
             </h2>
             <p className="font-semibold text-muted-foreground text-sm leading-5">

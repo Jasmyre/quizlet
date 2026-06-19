@@ -4,6 +4,7 @@ import { auth } from "@/auth";
 import { AppSidebar } from "@/components/app-sidebar";
 import MagicBackButton from "@/components/magic-back-button";
 import { FlashcardSetContent } from "@/components/pages/(app)/flashcardset/flashcard-set-content";
+import { FlashcardsColumn } from "@/components/pages/(app)/flashcardset/flashcards-column";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
@@ -29,7 +30,12 @@ const FlashcardSetPageContent = async ({
     notFound();
   }
 
-  return <FlashcardSetContent flashcardSet={flashcardSet} />;
+  return (
+    <div className="w-full">
+      <FlashcardSetContent flashcardSet={flashcardSet} />
+      <FlashcardsColumn flashcards={flashcardSet.flashcards} />
+    </div>
+  );
 };
 
 export default function FlashcardSetPage({

@@ -28,7 +28,7 @@ export default async function Page() {
               <MagicBackButton backLink={"/"} />
             </div>
           </header>
-          <main className="mx-auto flex w-full max-w-5xl justify-center">
+          <main className="mx-auto flex w-full max-w-5xl justify-center py-4">
             <div className="flex w-full flex-col gap-8">
               <Suspense fallback={null}>
                 <CreateFlashcardSetForm />

@@ -60,7 +60,7 @@ export default function FlashcardSetPage({
               <MagicBackButton />
             </div>
           </header>
-          <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center">
+          <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center py-4">
             <Suspense fallback={<div>Loading...</div>}>
               <FlashcardSetPageContent params={params} />
             </Suspense>

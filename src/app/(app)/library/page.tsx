@@ -27,7 +27,7 @@ export default function LibraryPage() {
               <MagicBackButton backLink={"/"} />
             </div>
           </header>
-          <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center">
+          <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center py-4">
             <LibraryPageContent />
           </main>
         </SidebarInset>

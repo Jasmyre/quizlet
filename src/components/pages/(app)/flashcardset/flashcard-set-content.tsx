@@ -10,7 +10,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { flashcardSetVisibilityLabels } from "@/lib/flashcard-set-visibility";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import type { FlashcardSetDetail } from "@/schemas/flashcard-set-detail-schema";
 
@@ -76,22 +76,18 @@ export function FlashcardSetContent({
     <div className="flex w-full min-w-0 flex-col gap-8 px-4 pb-10">
       <section className="flex min-w-0 flex-col gap-3">
         <div className="flex flex-col gap-2">
-          <div className="flex flex-wrap items-center gap-2 text-muted-foreground text-sm">
-            <span>{flashcardSetVisibilityLabels[flashcardSet.visibility]}</span>
-            <span aria-hidden="true">·</span>
-            <span>{cardCount} cards</span>
-            <span aria-hidden="true">·</span>
-            <span>by {flashcardSet.user.username}</span>
+          <div className="flex flex-col gap-1">
+            <h1 className="text-balance font-heading font-semibold text-3xl tracking-normal">
+              {flashcardSet.title}
+            </h1>
+            {flashcardSet.description ? (
+              <p className="text-muted-foreground text-sm">
+                {flashcardSet.description}
+              </p>
+            ) : null}
           </div>
-          <h1 className="text-balance font-heading font-semibold text-3xl tracking-normal">
-            {flashcardSet.title}
-          </h1>
-          {flashcardSet.description ? (
-            <p className="max-w-3xl text-muted-foreground">
-              {flashcardSet.description}
-            </p>
-          ) : null}
         </div>
+        <Separator />
       </section>
 
       {cardCount > 0 ? (
@@ -383,7 +379,6 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
 
           {/* Active Flashcard (Key moved here to force pristine element swapping) */}
           <button
-            key={activeIndex}
             aria-label={
               isFlipped
                 ? "Show the flashcard term"
@@ -394,6 +389,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
               isDragging ? "cursor-grabbing" : "cursor-pointer",
               "hover:shadow-md"
             )}
+            key={activeIndex}
             onClick={handleCardClick}
             onPointerCancel={handlePointerEnd}
             onPointerDown={handlePointerDown}

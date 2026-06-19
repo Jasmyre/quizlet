@@ -54,7 +54,7 @@ export default function UserPage({
               <MagicBackButton backLink={"/"} />
             </div>
           </header>
-          <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center">
+          <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center py-4">
             <Suspense fallback={<div>Loading...</div>}>
               <UserPageContent params={params} />
             </Suspense>

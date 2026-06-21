@@ -3,6 +3,7 @@ import { Suspense } from "react";
 import { auth } from "@/auth";
 import { AppSidebar } from "@/components/app-sidebar";
 import MagicBackButton from "@/components/magic-back-button";
+import { FlashcardSetActions } from "@/components/pages/(app)/flashcardset/flashcard-set-actions";
 import { FlashcardSetContent } from "@/components/pages/(app)/flashcardset/flashcard-set-content";
 import { FlashcardsColumn } from "@/components/pages/(app)/flashcardset/flashcards-column";
 import { Separator } from "@/components/ui/separator";
@@ -32,6 +33,7 @@ const FlashcardSetPageContent = async ({
   return (
     <div className="w-full">
       <FlashcardSetContent flashcardSet={flashcardSet} />
+      <FlashcardSetActions flashcardSet={flashcardSet} />
       <FlashcardsColumn flashcards={flashcardSet.flashcards} />
     </div>
   );

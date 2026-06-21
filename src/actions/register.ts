@@ -2,12 +2,17 @@
 
 import bcrypt from "bcryptjs";
 import type * as z from "zod";
-
+import { auth } from "@/auth";
 import { getUserByEmail } from "@/data/user";
 import { registerSchema } from "@/schemas/auth-schema";
 import { db } from "@/server/db";
 
 export const register = async (values: z.infer<typeof registerSchema>) => {
+  const session = await auth();
+  if (session) {
+    return { error: "You are already logged in!" };
+  }
+
   const validatedFields = registerSchema.safeParse(values);
 
   if (!validatedFields.success) {

@@ -428,6 +428,8 @@ function FlashcardSetCard({
           strokeWidth={2}
         />
       }
+      itemId={set.id}
+      itemType="flashcardset"
       metadata={
         <>
           {set.flashcardCount} cards <span aria-hidden="true">·</span> by{" "}
@@ -445,6 +447,8 @@ function FolderCard({ folder }: { folder: Folder }) {
       action={<LibraryItemMenu label={folder.name} />}
       description={folder.description ?? "No description"}
       icon={<FolderIcon className="size-5 text-amber-400" />}
+      itemId={folder.id}
+      itemType="folder"
       metadata={`${folder.setCount} sets`}
       title={folder.name}
     />
@@ -459,6 +463,8 @@ function ClassCard({ classroom }: { classroom: Classroom }) {
         classroom.description ?? `${capitalize(classroom.role)} class`
       }
       icon={<GraduationCapIcon className="size-5 text-emerald-400" />}
+      itemId={classroom.id}
+      itemType="classroom"
       metadata={
         <>
           {classroom.memberCount} members · {classroom.setCount} sets

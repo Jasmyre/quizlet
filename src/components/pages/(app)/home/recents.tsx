@@ -81,6 +81,8 @@ export function Recents() {
                 strokeWidth={2}
               />
             }
+            itemId={set.id}
+            itemType="flashcardset"
             key={set.id}
             metadata={
               <>

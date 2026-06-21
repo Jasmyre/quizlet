@@ -3,39 +3,46 @@ import { Suspense } from "react";
 import { auth } from "@/auth";
 import { AppSidebar } from "@/components/app-sidebar";
 import MagicBackButton from "@/components/magic-back-button";
-import { ProfileContent } from "@/components/pages/(app)/user/profile-content";
+import { FlashcardSetActions } from "@/components/pages/(app)/flashcardset/flashcard-set-actions";
+import { FlashcardSetContent } from "@/components/pages/(app)/flashcardset/flashcard-set-content";
+import { FlashcardsColumn } from "@/components/pages/(app)/flashcardset/flashcards-column";
 import { Separator } from "@/components/ui/separator";
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
-import { getUserProfile } from "@/lib/user-profile";
+import { getFlashcardSet } from "@/lib/flashcard-set";
 import { HydrateClient } from "@/trpc/server";
 
-const UserPageContent = async ({
+const FlashcardSetPageContent = async ({
   params,
 }: {
-  params: Promise<{ usernameOrId: string }>;
+  params: Promise<{ id: string }>;
 }) => {
-  const { usernameOrId } = await params;
-  const session = await auth();
-  const profile = await getUserProfile({
-    usernameOrId,
+  const [{ id }, session] = await Promise.all([params, auth()]);
+  const flashcardSet = await getFlashcardSet({
+    id,
     viewerUserId: session?.user?.id,
   });
 
-  if (!profile) {
+  if (!flashcardSet) {
     notFound();
   }
 
-  return <ProfileContent profile={profile} />;
+  return (
+    <div className="w-full">
+      <FlashcardSetContent flashcardSet={flashcardSet} />
+      <FlashcardSetActions flashcardSet={flashcardSet} />
+      <FlashcardsColumn flashcards={flashcardSet.flashcards} />
+    </div>
+  );
 };
 
-export default function UserPage({
+export default function FlashcardSetPage({
   params,
 }: {
-  params: Promise<{ usernameOrId: string }>;
+  params: Promise<{ id: string }>;
 }) {
   return (
     <HydrateClient>
@@ -51,12 +58,12 @@ export default function UserPage({
                   orientation="vertical"
                 />
               </div>
-              <MagicBackButton backLink={"/"} />
+              <MagicBackButton />
             </div>
           </header>
           <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center py-4">
             <Suspense fallback={<div>Loading...</div>}>
-              <UserPageContent params={params} />
+              <FlashcardSetPageContent params={params} />
             </Suspense>
           </main>
         </SidebarInset>

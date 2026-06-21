@@ -332,7 +332,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
         </Button>
 
         <div
-          className="relative h-[20rem] min-w-0 flex-1 overflow-visible sm:h-[28rem]"
+          className="relative h-80 min-w-0 flex-1 overflow-visible sm:h-112"
           style={{ perspective: "1000px" }}
         >
           {/* Depth Deck Stack */}

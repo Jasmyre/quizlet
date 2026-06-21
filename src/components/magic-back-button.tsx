@@ -3,7 +3,6 @@
 import { Slot } from "@radix-ui/react-slot";
 import type { VariantProps } from "class-variance-authority";
 import { useRouter } from "next/navigation";
-import { useCallback } from "react";
 import { usePageTrackerStore } from "react-page-tracker";
 import {
   getCurrentHostname,
@@ -12,6 +11,18 @@ import {
 } from "@/lib/magic-back-button";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
+
+const hostnameFromUrl = (url?: string) => {
+  try {
+    if (!url) {
+      return "";
+    }
+    // use getCurrentOrigin() so tests (and server) behave the same way
+    return new URL(url, getCurrentOrigin() || undefined).hostname;
+  } catch {
+    return "";
+  }
+};
 
 export type MagicBackButtonProps = {
   backLink?: string;
@@ -37,20 +48,7 @@ export function MagicBackButton({
   const trackerStore = usePageTrackerStore((s) => s);
   const referrerFromTracker: string = trackerStore?.referrer ?? "";
 
-  const hostnameFromUrl = (url?: string) => {
-    try {
-      if (!url) {
-        return "";
-      }
-      // use getCurrentOrigin() so tests (and server) behave the same way
-      return new URL(url, getCurrentOrigin() || undefined).hostname;
-    } catch {
-      return "";
-    }
-  };
-
-  // biome-ignore lint/correctness/useExhaustiveDependencies: hostnameFromUrl changes on every re-render and should not be used as a hook dependency
-  const handleClick = useCallback(() => {
+  const handleClick = () => {
     // 1) explicit backlink -> go there
     if (backLink) {
       try {
@@ -99,7 +97,7 @@ export function MagicBackButton({
     } catch {
       router.push(fallback);
     }
-  }, [backLink, fallbackPath, referrerFromTracker, router]);
+  };
 
   const Comp = asChild ? Slot : "button";
 

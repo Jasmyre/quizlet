@@ -19,8 +19,7 @@ const FlashcardSetPageContent = async ({
 }: {
   params: Promise<{ id: string }>;
 }) => {
-  const { id } = await params;
-  const session = await auth();
+  const [{ id }, session] = await Promise.all([params, auth()]);
   const flashcardSet = await getFlashcardSet({
     id,
     viewerUserId: session?.user?.id,

@@ -307,7 +307,7 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
     : "0ms";
 
   return (
-    <section className="flex min-w-0 flex-col gap-4 overflow-x-clip px-1 pb-8">
+    <section className="flex min-w-0 flex-col gap-4 overflow-x-clip px-1">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2 text-muted-foreground text-sm">
           <RotateCcwIcon className="size-4" />
@@ -319,18 +319,6 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
       </div>
 
       <div className="flex min-w-0 items-center gap-3 overflow-x-clip py-2">
-        <Button
-          aria-label="Show previous flashcard"
-          className="hidden sm:inline-flex"
-          disabled={isExiting}
-          onClick={showPreviousCard}
-          size="icon-lg"
-          type="button"
-          variant="outline"
-        >
-          <ChevronLeftIcon />
-        </Button>
-
         <div
           className="relative h-80 min-w-0 flex-1 overflow-visible sm:h-112"
           style={{ perspective: "1000px" }}
@@ -421,21 +409,9 @@ function FlashcardStudyViewer({ flashcards }: { flashcards: Flashcard[] }) {
             </div>
           </button>
         </div>
-
-        <Button
-          aria-label="Show next flashcard"
-          className="hidden sm:inline-flex"
-          disabled={isExiting}
-          onClick={showNextCard}
-          size="icon-lg"
-          type="button"
-          variant="outline"
-        >
-          <ChevronRightIcon />
-        </Button>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 sm:hidden">
+      <div className="grid grid-cols-2 gap-2">
         <Button
           disabled={isExiting}
           onClick={showPreviousCard}

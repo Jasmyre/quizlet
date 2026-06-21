@@ -45,6 +45,11 @@ interface ActionButton {
 
 const actionButtons = [
   {
+    icon: FileCheckIcon,
+    isWorking: true,
+    label: "Test",
+  },
+  {
     icon: BookOpenIcon,
     isWorking: false,
     label: "Flashcards",
@@ -68,11 +73,6 @@ const actionButtons = [
     icon: TargetIcon,
     isWorking: false,
     label: "Match",
-  },
-  {
-    icon: FileCheckIcon,
-    isWorking: true,
-    label: "Test",
   },
 ] as const satisfies ActionButton[];
 
@@ -127,18 +127,7 @@ export function FlashcardSetActions({
   };
 
   return (
-    <section className="flex min-w-0 flex-col gap-3 pb-10">
-      <div className="flex flex-col gap-2">
-        <div className="flex flex-col gap-1">
-          <h2 className="font-heading font-semibold text-xl tracking-normal">
-            Study this set
-          </h2>
-          <p className="text-muted-foreground text-sm">
-            Choose a study mode to practice this flashcard set.
-          </p>
-        </div>
-      </div>
-
+    <section className="flex min-w-0 flex-col gap-3 px-4 pb-10">
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-3">
         {actionButtons.map((action) => {
           const Icon = action.icon;
@@ -166,7 +155,11 @@ export function FlashcardSetActions({
               open={isDialogOpen}
             >
               <DialogTrigger asChild>
-                <Button disabled={maxQuestions === 0} type="button">
+                <Button
+                  disabled={maxQuestions === 0}
+                  type="button"
+                  variant="outline"
+                >
                   <Icon />
                   <span>{action.label}</span>
                 </Button>
@@ -331,7 +324,7 @@ function CheckboxField({
 }) {
   return (
     <label
-      className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors has-[:checked]:border-ring has-[:checked]:bg-muted/40"
+      className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors has-checked:border-ring has-[:checked]:bg-muted/40"
       htmlFor={id}
     >
       <Checkbox

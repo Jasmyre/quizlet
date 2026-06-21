@@ -12,12 +12,6 @@ type Flashcard = FlashcardSetDetail["flashcards"][number];
 export function FlashcardsColumn({ flashcards }: { flashcards: Flashcard[] }) {
   return (
     <div className="flex min-w-0 flex-col gap-8 px-4 pb-10">
-      <div>
-        <h2 className="font-semibold text-lg tracking-tight">
-          Terms in this set ({flashcards.length})
-        </h2>
-      </div>
-
       {flashcards.map((flashcard, index) => (
         <Card className="min-w-0 overflow-hidden" key={flashcard.id}>
           <CardHeader className="space-y-2 pb-3">

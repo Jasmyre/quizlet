@@ -30,6 +30,7 @@ const DEFAULT_DESCRIPTION =
 const DEFAULT_OG_IMAGE = "/thumbnail.png";
 
 export const metadata: Metadata = {
+  generator: "Next.js",
   metadataBase: new URL(BASE_URL),
   applicationName: SITE_NAME,
   title: {

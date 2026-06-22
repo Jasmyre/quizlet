@@ -2,6 +2,8 @@
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
 
+@plugin "tailwindcss-displaymodes";
+
 @custom-variant dark (&:is(.dark *));
 
 @theme {
@@ -162,6 +164,10 @@
   --shadow-lg: var(--shadow-lg);
   --shadow-xl: var(--shadow-xl);
   --shadow-2xl: var(--shadow-2xl);
+}
+
+body {
+  --webkit-tap-highlight-color: transparent;
 }
 
 @layer base {

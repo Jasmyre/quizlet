@@ -35,7 +35,6 @@ import {
   InputGroupAddon,
   InputGroupInput,
 } from "@/components/ui/input-group";
-import { Separator } from "@/components/ui/separator";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { flashcardSetVisibilityLabels } from "@/lib/flashcard-set-visibility";
 import type { UserLibrary } from "@/schemas/user-library-schema";
@@ -162,8 +161,6 @@ export function LibraryContent({ library }: { library: UserLibrary }) {
 
   return (
     <div className="flex w-full min-w-0 flex-col gap-8 px-4 pb-10">
-      <LibraryHeader library={library} />
-
       <Tabs
         className="gap-6"
         onValueChange={(value) => setActiveTab(value as LibraryTab)}
@@ -247,24 +244,6 @@ export function LibraryContent({ library }: { library: UserLibrary }) {
         </TabsContent>
       </Tabs>
     </div>
-  );
-}
-
-function LibraryHeader({ library }: { library: UserLibrary }) {
-  return (
-    <section className="flex min-w-0 flex-col gap-4">
-      <div className="flex min-w-0 flex-row items-end justify-between gap-4">
-        <div className="flex min-w-0 flex-col gap-1">
-          <h1 className="font-heading font-semibold text-2xl tracking-normal">
-            Your library
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            Study sets, folders, and classes saved for {library.user.username}.
-          </p>
-        </div>
-      </div>
-      <Separator />
-    </section>
   );
 }
 

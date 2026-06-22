@@ -274,14 +274,6 @@ export const CreateFlashcardSetForm = () => {
       onSubmit={form.handleSubmit(onSubmit)}
     >
       <FieldSet className="mx-auto w-full max-w-7xl gap-8">
-        <div className="flex flex-row flex-wrap justify-between gap-4 pt-4">
-          <div className="gap- flex flex-row justify-between">
-            <h1 className="font-bold text-2xl text-slate-50">
-              Create a new flashcard set
-            </h1>
-          </div>
-        </div>
-
         <FieldGroup className="gap-5">
           <Controller
             control={form.control}

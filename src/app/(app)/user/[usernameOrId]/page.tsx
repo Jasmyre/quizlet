@@ -20,8 +20,12 @@ const UserPageContent = async ({
 }) => {
   const { usernameOrId } = await params;
   const session = await auth();
+
+  // Normalize the input by decoding URI components
+  const decodedUsernameOrId = decodeURIComponent(usernameOrId);
+
   const profile = await getUserProfile({
-    usernameOrId,
+    usernameOrId: decodedUsernameOrId,
     viewerUserId: session?.user?.id,
   });
 

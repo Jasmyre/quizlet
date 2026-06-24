@@ -24,16 +24,16 @@ export function TestCompleteCard({ summary }: TestCompleteCardProps) {
       <CardHeader className="border-b bg-muted/20">
         <CardTitle className="text-2xl">Test complete</CardTitle>
         <CardDescription>
-          You answered {summary.correctCount} out of {summary.totalQuestions}{" "}
-          questions correctly.
+          You earned {summary.correctPoints} out of {summary.totalPoints} points
+          across {summary.totalQuestions} questions.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6 p-6">
         <div className="grid gap-3 sm:grid-cols-3">
           <Metric label="Score" value={`${summary.scorePercent}%`} />
           <Metric
-            label="Correct"
-            value={`${summary.correctCount} / ${summary.totalQuestions}`}
+            label="Points"
+            value={`${summary.correctPoints} / ${summary.totalPoints}`}
           />
           <Metric label="Time" value={`${minutes}m ${seconds}s`} />
         </div>

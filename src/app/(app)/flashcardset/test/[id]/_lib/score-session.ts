@@ -57,16 +57,27 @@ export function scoreSession({
   const correctCount = responses.filter(
     (response) => response.wasCorrect
   ).length;
+  const totalPoints = questions.reduce(
+    (sum, question) => sum + (question.pointWeight ?? 1),
+    0
+  );
+  const correctPoints = responses.reduce((sum, response, index) => {
+    if (!response.wasCorrect) {
+      return sum;
+    }
+
+    return sum + (questions[index]?.pointWeight ?? 1);
+  }, 0);
   const scorePercent =
-    responses.length === 0
-      ? 0
-      : Math.round((correctCount / responses.length) * 100);
+    totalPoints === 0 ? 0 : Math.round((correctPoints / totalPoints) * 100);
 
   return {
     correctCount,
+    correctPoints,
     responses,
     scorePercent,
     timeTakenMs,
+    totalPoints,
     totalQuestions: questions.length,
   };
 }

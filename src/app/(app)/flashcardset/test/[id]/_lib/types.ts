@@ -41,6 +41,7 @@ interface QuestionBase {
   flashcardIds: string[];
   headerText: string;
   id: string;
+  pointWeight?: number;
   promptMode: PromptMode;
 }
 
@@ -60,6 +61,7 @@ export interface MultipleChoiceQuestion extends QuestionBase {
 
 export interface MatchingQuestion extends QuestionBase {
   answerBank: MatchingChoice[];
+  batch: Flashcard[];
   correctAnswer: MatchingAssignments;
   correctAnswerText: string;
   slots: MatchingSlot[];
@@ -94,9 +96,11 @@ export interface TestResponse extends TestResponseRecord {
 
 export interface TestSessionSummary {
   correctCount: number;
+  correctPoints: number;
   responses: TestResponse[];
   scorePercent: number;
   timeTakenMs: number;
+  totalPoints: number;
   totalQuestions: number;
 }
 

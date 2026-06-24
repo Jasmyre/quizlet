@@ -26,7 +26,7 @@ export function WrittenQuestion({
   return (
     <QuestionShell feedback={feedback} title={question.headerText}>
       <div className="flex flex-col gap-4">
-        <Label className="flex flex-col gap-2">
+        <Label className="flex flex-col items-start gap-2">
           <span className="font-medium">Your answer</span>
           <Input
             autoComplete="off"
@@ -42,7 +42,7 @@ export function WrittenQuestion({
           />
         </Label>
         <p className="text-muted-foreground text-sm">
-          Answers are matched after trimming whitespace and lowercasing.
+          lowercase and whitespace are ignored.
         </p>
       </div>
     </QuestionShell>

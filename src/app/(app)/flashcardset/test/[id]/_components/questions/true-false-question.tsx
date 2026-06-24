@@ -1,8 +1,8 @@
-// Depends on the shared question shell and shadcn RadioGroup primitives for the binary choice input.
+// Depends on the shared question shell and shadcn Card primitives for the binary choice input.
 "use client";
 
-import { Label } from "@/components/ui/label";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Card, CardContent } from "@/components/ui/card";
+import { cn } from "@/lib/utils";
 import type { TestAnswer, TestFeedback, TestQuestion } from "../../_lib/types";
 import { QuestionShell } from "../question-shell";
 
@@ -33,23 +33,22 @@ export function TrueFalseQuestion({
         <div className="rounded-xl border bg-background p-4">
           <p className="text-sm leading-relaxed">{question.statementText}</p>
         </div>
-        <RadioGroup
-          className="grid gap-3 sm:grid-cols-2"
-          disabled={isDisabled}
-          onValueChange={(nextValue) => onChange(nextValue === "true")}
-          value={selectedValue}
-        >
+        <div className="grid gap-3 sm:grid-cols-2">
           <Choice
             description="The statement is correct."
+            isDisabled={isDisabled}
+            isSelected={selectedValue === "true"}
             label="True"
-            value="true"
+            onSelect={() => onChange(true)}
           />
           <Choice
             description="The statement is not correct."
+            isDisabled={isDisabled}
+            isSelected={selectedValue === "false"}
             label="False"
-            value="false"
+            onSelect={() => onChange(false)}
           />
-        </RadioGroup>
+        </div>
       </div>
     </QuestionShell>
   );
@@ -57,20 +56,50 @@ export function TrueFalseQuestion({
 
 function Choice({
   description,
+  isDisabled,
+  isSelected,
   label,
-  value,
+  onSelect,
 }: {
   description: string;
+  isDisabled: boolean;
+  isSelected: boolean;
   label: string;
-  value: string;
+  onSelect: () => void;
 }) {
   return (
-    <Label className="flex cursor-pointer flex-col gap-2 rounded-xl border bg-background p-4 transition-colors hover:bg-muted/40 has-data-[state=checked]:border-primary has-data-[state=checked]:bg-primary/5">
-      <div className="flex items-center gap-3">
-        <RadioGroupItem value={value} />
-        <span className="font-medium">{label}</span>
-      </div>
-      <span className="text-muted-foreground text-sm">{description}</span>
-    </Label>
+    <Card
+      className={cn(
+        "cursor-pointer border transition-colors",
+        isSelected
+          ? "border-primary bg-primary/5 ring-2 ring-primary"
+          : "hover:border-primary/40 hover:bg-muted/40",
+        isDisabled && "cursor-not-allowed opacity-70"
+      )}
+      onClick={() => {
+        if (!isDisabled) {
+          onSelect();
+        }
+      }}
+      onKeyDown={(event) => {
+        if (isDisabled) {
+          return;
+        }
+
+        if (event.key === "Enter" || event.key === " ") {
+          event.preventDefault();
+          onSelect();
+        }
+      }}
+      role="button"
+      tabIndex={isDisabled ? -1 : 0}
+    >
+      <CardContent className="p-4">
+        <div className="flex flex-col gap-2">
+          <span className="font-medium">{label}</span>
+          <span className="text-muted-foreground text-sm">{description}</span>
+        </div>
+      </CardContent>
+    </Card>
   );
 }

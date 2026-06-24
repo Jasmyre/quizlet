@@ -36,6 +36,10 @@ export function buildQuestionBank({
     config.questionCount,
     config.selectedQuestionTypes
   );
+  const matchingBatchSize = Math.max(
+    1,
+    Math.ceil(flashcards.length / Math.max(1, config.selectedQuestionTypes.length))
+  );
 
   return questionTypes.map((type, index) => {
     const flashcard = deck[index % deck.length];
@@ -51,7 +55,7 @@ export function buildQuestionBank({
     if (type === "matching") {
       return buildMatchingQuestion({
         config,
-        deck,
+        batch: collectMatchingBatch(deck, index, matchingBatchSize),
         index,
       });
     }
@@ -152,14 +156,14 @@ function buildWrittenQuestion({
 
 function buildMatchingQuestion({
   config,
-  deck,
+  batch,
   index,
 }: {
   config: TestConfig;
-  deck: Flashcard[];
+  batch: Flashcard[];
   index: number;
 }): TestQuestion {
-  const cards = collectMatchingCards(deck, index);
+  const cards = batch;
 
   const slots: MatchingSlot[] = cards.map((card, slotIndex) => {
     const promptVariant = resolvePromptVariant(card, config.promptMode);
@@ -188,14 +192,44 @@ function buildMatchingQuestion({
     answerBank,
     correctAnswer,
     correctAnswerText: slots.map((slot) => slot.answerText).join(" · "),
+    batch: cards,
     flashcardIds: cards.map((card) => card.id),
     headerText:
       slots[0]?.promptText ?? cards[0]?.term ?? cards[0]?.definition ?? "",
     id: `question-${index}-matching`,
     promptMode: config.promptMode,
+    pointWeight: cards.length,
     slots,
     type: "matching",
   };
+}
+
+function collectMatchingBatch(
+  deck: Flashcard[],
+  startIndex: number,
+  batchSize: number
+): Flashcard[] {
+  const cards: Flashcard[] = [];
+
+  for (let offset = 0; offset < batchSize; offset += 1) {
+    const card = deck[(startIndex + offset) % deck.length];
+
+    if (card) {
+      cards.push(card);
+    }
+  }
+
+  while (cards.length < batchSize) {
+    const fallbackCard = deck[cards.length % deck.length];
+
+    if (!fallbackCard) {
+      break;
+    }
+
+    cards.push(fallbackCard);
+  }
+
+  return cards;
 }
 
 function buildMultipleChoiceChoices({
@@ -217,33 +251,6 @@ function buildMultipleChoiceChoices({
   const distractors = shuffle(uniquePool).slice(0, 3);
 
   return shuffle([correctAnswerText, ...distractors]);
-}
-
-function collectMatchingCards(
-  deck: Flashcard[],
-  startIndex: number
-): Flashcard[] {
-  const cards: Flashcard[] = [];
-
-  for (let offset = 0; offset < 4; offset += 1) {
-    const card = deck[(startIndex + offset) % deck.length];
-
-    if (card) {
-      cards.push(card);
-    }
-  }
-
-  while (cards.length < 4) {
-    const fallbackCard = deck[cards.length % deck.length];
-
-    if (!fallbackCard) {
-      break;
-    }
-
-    cards.push(fallbackCard);
-  }
-
-  return cards;
 }
 
 function resolvePromptVariant(

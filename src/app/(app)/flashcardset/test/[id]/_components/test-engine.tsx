@@ -173,7 +173,7 @@ export function TestEngine({ searchParams }: TestEngineProps) {
   const isInstantQuestion = shouldInstantResponse(currentQuestion);
   const scoreLabel =
     config.instantResponse || isComplete
-      ? `${summary.correctCount} / ${summary.totalQuestions}`
+      ? `${summary.correctPoints} / ${summary.totalPoints}`
       : "Score hidden until the end";
 
   const handleContinue = (): void => {

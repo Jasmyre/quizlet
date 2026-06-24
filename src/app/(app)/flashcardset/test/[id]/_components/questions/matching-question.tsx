@@ -2,7 +2,7 @@
 "use client";
 
 import { XIcon } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
@@ -34,6 +34,11 @@ export function MatchingQuestion({
   );
   const [activeSlotId, setActiveSlotId] = useState<string | null>(null);
   const [activeAnswerId, setActiveAnswerId] = useState<string | null>(null);
+  const onChangeRef = useRef(onChange);
+
+  useEffect(() => {
+    onChangeRef.current = onChange;
+  }, [onChange]);
 
   useEffect(() => {
     const nextAssignments = getAssignments(value, question);
@@ -46,6 +51,16 @@ export function MatchingQuestion({
     setActiveSlotId(null);
     setActiveAnswerId(null);
   }, [question, value]);
+
+  useEffect(() => {
+    const nextAssignments = getAssignments(value, question);
+
+    if (areAssignmentsEqual(assignments, nextAssignments)) {
+      return;
+    }
+
+    onChangeRef.current(assignments);
+  }, [assignments, question, value]);
 
   const assignedAnswerIds = useMemo(
     () => new Set(Object.values(assignments)),
@@ -71,7 +86,6 @@ export function MatchingQuestion({
       }
 
       nextAssignments[slotId] = answerId;
-      onChange(nextAssignments);
 
       return nextAssignments;
     });
@@ -134,7 +148,6 @@ export function MatchingQuestion({
 
       const nextAssignments = { ...currentAssignments };
       delete nextAssignments[slotId];
-      onChange(nextAssignments);
 
       return nextAssignments;
     });

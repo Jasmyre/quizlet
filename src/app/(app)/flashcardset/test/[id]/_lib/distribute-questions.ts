@@ -1,13 +1,6 @@
 // Depends on the available test types and the shuffled deck order produced by the client engine.
 import type { QuestionType } from "./types";
 
-const defaultQuestionTypes = [
-  "true_false",
-  "multiple_choice",
-  "matching",
-  "written",
-] as const satisfies QuestionType[];
-
 export function distributeQuestions(
   questionCount: number,
   selectedQuestionTypes: QuestionType[]
@@ -15,7 +8,12 @@ export function distributeQuestions(
   const enabledQuestionTypes =
     selectedQuestionTypes.length > 0
       ? selectedQuestionTypes
-      : [...defaultQuestionTypes];
+      : [
+          "true_false",
+          "multiple_choice",
+          "matching",
+          "written",
+        ];
 
   if (questionCount <= 0) {
     return [];
@@ -27,11 +25,9 @@ export function distributeQuestions(
     const questionType =
       enabledQuestionTypes[index % enabledQuestionTypes.length];
 
-    if (!questionType) {
-      continue;
+    if (questionType) {
+      assignments.push(questionType);
     }
-
-    assignments.push(questionType);
   }
 
   return assignments;

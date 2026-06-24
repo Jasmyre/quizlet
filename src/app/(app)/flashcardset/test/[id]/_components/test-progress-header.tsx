@@ -7,14 +7,14 @@ export function TestProgressHeader({
   correctCount,
   disabledScoreLabel,
   progressValue,
-  questionIndex,
-  totalQuestions,
+  slideIndex,
+  totalSlides,
 }: {
   correctCount: number;
   disabledScoreLabel?: string;
   progressValue: number;
-  questionIndex: number;
-  totalQuestions: number;
+  slideIndex: number;
+  totalSlides: number;
 }) {
   return (
     <div className="flex flex-col gap-4 rounded-2xl border bg-card p-4 shadow-sm">
@@ -22,13 +22,13 @@ export function TestProgressHeader({
         <div className="space-y-1">
           <p className="text-muted-foreground text-sm">Progress</p>
           <p className="font-heading font-semibold text-2xl tracking-tight">
-            Question {questionIndex + 1} of {totalQuestions}
+            Slide {slideIndex + 1} of {totalSlides}
           </p>
         </div>
         <div className="text-right">
           <p className="text-muted-foreground text-sm">Score</p>
           <p className="font-medium text-sm">
-            {disabledScoreLabel ?? `${correctCount} / ${totalQuestions}`}
+            {disabledScoreLabel ?? `${correctCount} / ${totalSlides}`}
           </p>
         </div>
       </div>

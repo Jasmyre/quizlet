@@ -5,6 +5,12 @@ export type QuestionType =
   | "matching"
   | "written";
 
+export type TestSlideType =
+  | "TrueFalse"
+  | "MultipleChoice"
+  | "Written"
+  | "Matching";
+
 export type PromptMode = "term" | "definition" | "both";
 
 export type MatchingAssignments = Record<string, string>;
@@ -81,6 +87,24 @@ export type TestQuestion =
   | MatchingQuestion
   | WrittenQuestion;
 
+export type TestSlide =
+  | {
+      question: Flashcard;
+      type: "TrueFalse";
+    }
+  | {
+      question: Flashcard;
+      type: "MultipleChoice";
+    }
+  | {
+      question: Flashcard;
+      type: "Written";
+    }
+  | {
+      batch: Flashcard[];
+      type: "Matching";
+    };
+
 export interface TestResponseRecord {
   answeredAt: string;
   flashcardIds: string[];
@@ -91,6 +115,19 @@ export interface TestResponseRecord {
 
 export interface TestResponse extends TestResponseRecord {
   correctAnswerText: string;
+  earnedPoints: number;
+  possiblePoints: number;
+  wasCorrect: boolean;
+}
+
+export interface TestSlideResponseRecord {
+  answeredAt: string;
+  earnedPoints: number;
+  flashcardIds: string[];
+  possiblePoints: number;
+  slideId: string;
+  type: TestSlideType;
+  userResponse: TestAnswer;
   wasCorrect: boolean;
 }
 
@@ -102,6 +139,7 @@ export interface TestSessionSummary {
   timeTakenMs: number;
   totalPoints: number;
   totalQuestions: number;
+  totalSlides: number;
 }
 
 export interface TestFeedback {

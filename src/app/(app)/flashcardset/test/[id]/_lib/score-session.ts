@@ -6,6 +6,7 @@ import type {
   TestResponse,
   TestResponseRecord,
   TestSessionSummary,
+  TestSlideResponseRecord,
 } from "./types";
 
 export function isCorrectAnswer(
@@ -41,12 +42,15 @@ export function scoreSession({
   const responses: TestResponse[] = questions.map((question) => {
     const record = records[question.id];
     const userResponse = record?.userResponse ?? "";
+    const possiblePoints = question.pointWeight ?? 1;
     const wasCorrect = record ? isCorrectAnswer(question, userResponse) : false;
 
     return {
       answeredAt: record?.answeredAt ?? "",
       correctAnswerText: question.correctAnswerText,
+      earnedPoints: wasCorrect ? possiblePoints : 0,
       flashcardIds: record?.flashcardIds ?? question.flashcardIds,
+      possiblePoints,
       questionId: question.id,
       type: question.type,
       userResponse,
@@ -61,13 +65,10 @@ export function scoreSession({
     (sum, question) => sum + (question.pointWeight ?? 1),
     0
   );
-  const correctPoints = responses.reduce((sum, response, index) => {
-    if (!response.wasCorrect) {
-      return sum;
-    }
-
-    return sum + (questions[index]?.pointWeight ?? 1);
-  }, 0);
+  const correctPoints = responses.reduce(
+    (sum, response) => sum + response.earnedPoints,
+    0
+  );
   const scorePercent =
     totalPoints === 0 ? 0 : Math.round((correctPoints / totalPoints) * 100);
 
@@ -79,6 +80,62 @@ export function scoreSession({
     timeTakenMs,
     totalPoints,
     totalQuestions: questions.length,
+    totalSlides: questions.length,
+  };
+}
+
+export function scoreSlideSession({
+  questions,
+  records,
+  timeTakenMs,
+}: {
+  questions: TestQuestion[];
+  records: Record<string, TestSlideResponseRecord>;
+  timeTakenMs: number;
+}): TestSessionSummary {
+  const responses: TestResponse[] = questions.map((question) => {
+    const record = records[question.id];
+    const userResponse = record?.userResponse ?? "";
+    const possiblePoints = question.pointWeight ?? 1;
+    const earnedPoints = record?.earnedPoints ?? 0;
+    const wasCorrect = record ? record.wasCorrect : false;
+
+    return {
+      answeredAt: record?.answeredAt ?? "",
+      correctAnswerText: question.correctAnswerText,
+      earnedPoints,
+      flashcardIds: record?.flashcardIds ?? question.flashcardIds,
+      possiblePoints,
+      questionId: question.id,
+      type: question.type,
+      userResponse,
+      wasCorrect,
+    };
+  });
+
+  const correctCount = responses.filter(
+    (response) => response.wasCorrect
+  ).length;
+  const totalPoints = questions.reduce(
+    (sum, question) => sum + (question.pointWeight ?? 1),
+    0
+  );
+  const correctPoints = responses.reduce(
+    (sum, response) => sum + response.earnedPoints,
+    0
+  );
+  const scorePercent =
+    totalPoints === 0 ? 0 : Math.round((correctPoints / totalPoints) * 100);
+
+  return {
+    correctCount,
+    correctPoints,
+    responses,
+    scorePercent,
+    timeTakenMs,
+    totalPoints,
+    totalQuestions: questions.length,
+    totalSlides: questions.length,
   };
 }
 

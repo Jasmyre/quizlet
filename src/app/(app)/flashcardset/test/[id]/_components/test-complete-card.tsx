@@ -25,7 +25,7 @@ export function TestCompleteCard({ summary }: TestCompleteCardProps) {
         <CardTitle className="text-2xl">Test complete</CardTitle>
         <CardDescription>
           You earned {summary.correctPoints} out of {summary.totalPoints} points
-          across {summary.totalQuestions} questions.
+          across {summary.totalSlides} slides.
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-6 p-6">
@@ -40,7 +40,7 @@ export function TestCompleteCard({ summary }: TestCompleteCardProps) {
 
         <div className="rounded-xl border bg-background p-4">
           <p className="text-muted-foreground text-sm">
-            Your score, timing, and per-question results are summarized above.
+            Your score, timing, and per-slide results are summarized above.
           </p>
         </div>
       </CardContent>

@@ -8,12 +8,12 @@ export function distributeQuestions(
   const enabledQuestionTypes =
     selectedQuestionTypes.length > 0
       ? selectedQuestionTypes
-      : [
+      : ([
           "true_false",
           "multiple_choice",
           "matching",
           "written",
-        ];
+        ] satisfies QuestionType[]);
 
   if (questionCount <= 0) {
     return [];

@@ -31,12 +31,14 @@ export type MagicBackButtonProps = {
   ariaLabel?: string;
   asChild?: boolean;
   children?: React.ReactNode;
+  disabled?: boolean;
 } & VariantProps<typeof buttonVariants>;
 
 export function MagicBackButton({
   backLink,
   fallbackPath,
   className,
+  disabled = false,
   ariaLabel = "Go back",
   asChild = false,
   children,
@@ -106,6 +108,7 @@ export function MagicBackButton({
       aria-label={ariaLabel}
       className={cn(buttonVariants({ variant, size, className }))}
       data-slot="button"
+      disabled={disabled}
       onClick={handleClick}
       type={Comp === "button" ? "button" : undefined}
     >

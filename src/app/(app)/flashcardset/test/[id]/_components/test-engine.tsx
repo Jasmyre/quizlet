@@ -1,10 +1,23 @@
+// Depends on the mock deck, question-bank builder, config parser, and question components that power the flashcard test route.
 "use client";
 
-import { CheckIcon, ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
-import { useEffect, useMemo, useRef } from "react";
+import {
+  CheckIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  Loader2Icon,
+} from "lucide-react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
+import { Skeleton } from "@/components/ui/skeleton";
 import { mockFlashcards } from "../_data/mock-data";
 import { buildQuestionBank } from "../_lib/build-question-bank";
 import { parseTestConfig } from "../_lib/parse-test-config";
@@ -15,23 +28,44 @@ import { MultipleChoiceQuestion } from "./questions/multiple-choice-question";
 import { TrueFalseQuestion } from "./questions/true-false-question";
 import { WrittenQuestion } from "./questions/written-question";
 import { TestCompleteCard } from "./test-complete-card";
+import { TestConfigPanel } from "./test-config-panel";
 import { TestProgressHeader } from "./test-progress-header";
 
 interface TestEngineProps {
-  flashcardSetId: string;
   searchParams: Record<string, string | string[] | undefined>;
 }
 
-export function TestEngine({ flashcardSetId, searchParams }: TestEngineProps) {
+const EMPTY_QUESTIONS: TestQuestion[] = [];
+
+export function TestEngine({ searchParams }: TestEngineProps) {
   const config = useMemo(() => parseTestConfig(searchParams), [searchParams]);
-  const questions = useMemo(
-    () =>
-      buildQuestionBank({
-        answerWith: config.answerWith,
-        config,
-        flashcards: mockFlashcards,
-      }),
-    [config]
+  const [isMounted, setIsMounted] = useState(false);
+  const [questions, setQuestions] = useState<TestQuestion[] | null>(null);
+  const resolvedQuestions = questions ?? EMPTY_QUESTIONS;
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) {
+      return;
+    }
+
+    setQuestions(null);
+    const nextQuestions = buildQuestionBank({
+      config,
+      flashcards: mockFlashcards,
+    });
+    setQuestions(nextQuestions);
+  }, [config, isMounted]);
+
+  const shouldInstantResponse = useMemo(
+    () => (question: TestQuestion) =>
+      config.instantResponse &&
+      question.type !== "matching" &&
+      question.type !== "written",
+    [config.instantResponse]
   );
 
   const {
@@ -47,14 +81,35 @@ export function TestEngine({ flashcardSetId, searchParams }: TestEngineProps) {
     isCurrentQuestionLocked,
     setDraftAnswer,
     summary,
-    timeTakenMs,
-  } = useTestSession({ config, questions });
+  } = useTestSession({
+    config,
+    questions: questions ?? [],
+    shouldInstantResponse,
+  });
 
   const autoAdvanceTimerRef = useRef<number | null>(null);
   const hasLoggedCompletionRef = useRef(false);
+  const loggedSessionKeyRef = useRef("");
 
   useEffect(() => {
-    if (!(currentReveal && config.instantResponse)) {
+    const nextSessionKey = resolvedQuestions
+      .map((question) => question.id)
+      .join("|");
+
+    if (loggedSessionKeyRef.current === nextSessionKey) {
+      return;
+    }
+
+    loggedSessionKeyRef.current = nextSessionKey;
+    hasLoggedCompletionRef.current = false;
+  }, [resolvedQuestions]);
+
+  useEffect(() => {
+    if (!(currentQuestion && currentReveal)) {
+      return;
+    }
+
+    if (!shouldInstantResponse(currentQuestion)) {
       return;
     }
 
@@ -74,7 +129,13 @@ export function TestEngine({ flashcardSetId, searchParams }: TestEngineProps) {
         autoAdvanceTimerRef.current = null;
       }
     };
-  }, [clearReveal, config.instantResponse, currentReveal, goNext]);
+  }, [
+    clearReveal,
+    currentQuestion,
+    currentReveal,
+    goNext,
+    shouldInstantResponse,
+  ]);
 
   useEffect(() => {
     if (!isComplete || hasLoggedCompletionRef.current) {
@@ -82,59 +143,35 @@ export function TestEngine({ flashcardSetId, searchParams }: TestEngineProps) {
     }
 
     hasLoggedCompletionRef.current = true;
-    console.log("Flashcard test session complete", {
-      flashcardSetId,
-      config,
-      completedAt: new Date().toISOString(),
-      totalQuestions: summary.totalQuestions,
-      correctCount: summary.correctCount,
-      scorePercent: summary.scorePercent,
-      timeTakenMs,
-      responses: summary.responses.map((response) => ({
-        questionId: response.questionId,
-        userResponse: response.userResponse,
-        wasCorrect: response.wasCorrect,
-      })),
-    });
-  }, [
-    config,
-    flashcardSetId,
-    isComplete,
-    summary.correctCount,
-    summary.responses,
-    summary.scorePercent,
-    summary.totalQuestions,
-    timeTakenMs,
-  ]);
+  }, [isComplete]);
 
-  if (questions.length === 0) {
+  if (!isMounted || questions === null) {
+    return <LoadingShell />;
+  }
+
+  if (resolvedQuestions.length === 0) {
     return (
       <Card className="border-dashed">
         <CardContent className="flex min-h-64 flex-col items-center justify-center gap-3 text-center">
-          <h2 className="font-heading font-semibold text-2xl">
-            No questions available
-          </h2>
-          <p className="max-w-lg text-muted-foreground">
+          <CardTitle className="text-2xl">No questions available</CardTitle>
+          <CardDescription className="max-w-lg">
             The current test configuration did not produce any questions from
             the mock deck.
-          </p>
+          </CardDescription>
         </CardContent>
       </Card>
     );
   }
 
   if (isComplete || !currentQuestion) {
-    return (
-      <div className="flex flex-col gap-6">
-        <TestCompleteCard sessionId={flashcardSetId} summary={summary} />
-      </div>
-    );
+    return <TestCompleteCard summary={summary} />;
   }
 
   const currentFeedback =
     currentReveal?.questionId === currentQuestion.id ? currentReveal : null;
-  const progressValue = ((currentIndex + 1) / questions.length) * 100;
+  const progressValue = ((currentIndex + 1) / resolvedQuestions.length) * 100;
   const canContinue = isAnswerReady(currentQuestion, currentDraftAnswer);
+  const isInstantQuestion = shouldInstantResponse(currentQuestion);
   const scoreLabel =
     config.instantResponse || isComplete
       ? `${summary.correctCount} / ${summary.totalQuestions}`
@@ -158,24 +195,19 @@ export function TestEngine({ flashcardSetId, searchParams }: TestEngineProps) {
       return;
     }
 
-    if (!config.instantResponse) {
+    if (!isInstantQuestion) {
       goNext();
     }
   };
 
   const handleChange = (value: TestAnswer): void => {
-    if (config.instantResponse) {
+    if (isInstantQuestion) {
       if (autoAdvanceTimerRef.current !== null) {
         window.clearTimeout(autoAdvanceTimerRef.current);
         autoAdvanceTimerRef.current = null;
       }
 
-      const committed = commitCurrentAnswer(value);
-
-      if (!committed) {
-        return;
-      }
-
+      commitCurrentAnswer(value);
       return;
     }
 
@@ -189,7 +221,12 @@ export function TestEngine({ flashcardSetId, searchParams }: TestEngineProps) {
         disabledScoreLabel={scoreLabel}
         progressValue={progressValue}
         questionIndex={currentIndex}
-        totalQuestions={questions.length}
+        totalQuestions={resolvedQuestions.length}
+      />
+
+      <TestConfigPanel
+        config={config}
+        questionCount={resolvedQuestions.length}
       />
 
       {renderQuestion({
@@ -198,14 +235,13 @@ export function TestEngine({ flashcardSetId, searchParams }: TestEngineProps) {
         currentQuestion,
         handleChange,
         isCurrentQuestionLocked,
-        questionIndex: currentIndex,
-        totalQuestions: questions.length,
+        value: currentDraftAnswer,
       })}
 
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-card p-4 shadow-sm">
         <div className="flex items-center gap-3 text-muted-foreground text-sm">
           <span>
-            {currentIndex + 1} of {questions.length}
+            {currentIndex + 1} of {resolvedQuestions.length}
           </span>
           <Separator className="h-4" orientation="vertical" />
           <span>
@@ -236,7 +272,7 @@ export function TestEngine({ flashcardSetId, searchParams }: TestEngineProps) {
                 <CheckIcon data-icon="inline-start" />
                 Continue
               </>
-            ) : currentIndex === questions.length - 1 ? (
+            ) : currentIndex === resolvedQuestions.length - 1 ? (
               <>
                 Finish
                 <ChevronRightIcon data-icon="inline-end" />
@@ -260,38 +296,58 @@ function renderQuestion({
   currentQuestion,
   handleChange,
   isCurrentQuestionLocked,
-  questionIndex,
-  totalQuestions,
+  value,
 }: {
   currentDraftAnswer: TestAnswer | undefined;
   currentFeedback: TestFeedback | null;
   currentQuestion: TestQuestion;
   handleChange: (value: TestAnswer) => void;
   isCurrentQuestionLocked: boolean;
-  questionIndex: number;
-  totalQuestions: number;
+  value: TestAnswer | undefined;
 }) {
-  const commonProps = {
+  const baseProps = {
     feedback: currentFeedback,
     isDisabled: isCurrentQuestionLocked,
     onChange: handleChange,
-    questionIndex,
-    question: currentQuestion,
-    totalQuestions,
-    value: currentDraftAnswer,
+    value: currentDraftAnswer ?? value,
   };
+  const questionKey = currentQuestion.id;
 
   switch (currentQuestion.type) {
     case "true_false":
-      return <TrueFalseQuestion {...commonProps} />;
+      return (
+        <TrueFalseQuestion
+          {...baseProps}
+          key={questionKey}
+          question={currentQuestion}
+        />
+      );
     case "multiple_choice":
-      return <MultipleChoiceQuestion {...commonProps} />;
+      return (
+        <MultipleChoiceQuestion
+          {...baseProps}
+          key={questionKey}
+          question={currentQuestion}
+        />
+      );
     case "matching":
-      return <MatchingQuestion {...commonProps} />;
+      return (
+        <MatchingQuestion
+          {...baseProps}
+          key={questionKey}
+          question={currentQuestion}
+        />
+      );
     case "written":
-      return <WrittenQuestion {...commonProps} />;
+      return (
+        <WrittenQuestion
+          {...baseProps}
+          key={questionKey}
+          question={currentQuestion}
+        />
+      );
     default:
-      return <WrittenQuestion {...commonProps} />;
+      return null;
   }
 }
 
@@ -304,5 +360,46 @@ function isAnswerReady(question: TestQuestion, value: TestAnswer | undefined) {
     return typeof value === "boolean";
   }
 
+  if (question.type === "matching") {
+    if (typeof value !== "object" || value === null) {
+      return false;
+    }
+
+    return question.slots.every((slot) => {
+      const assignment = value[slot.id];
+
+      return typeof assignment === "string" && assignment.trim().length > 0;
+    });
+  }
+
   return typeof value === "string" && value.trim().length > 0;
+}
+
+function LoadingShell() {
+  return (
+    <Card className="overflow-hidden">
+      <CardHeader className="border-b bg-muted/20">
+        <CardTitle className="text-2xl">
+          <Skeleton className="h-8 w-56" />
+        </CardTitle>
+        <CardDescription>
+          <Skeleton className="h-4 w-80" />
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="flex flex-col gap-6 p-6">
+        <div className="flex flex-col gap-3">
+          <Skeleton className="h-3 w-full" />
+          <Skeleton className="h-64 w-full rounded-2xl" />
+        </div>
+        <div className="flex items-center justify-between gap-3">
+          <Skeleton className="h-10 w-40 rounded-lg" />
+          <Skeleton className="h-10 w-32 rounded-lg" />
+        </div>
+        <div className="flex items-center gap-2 text-muted-foreground text-sm">
+          <Loader2Icon className="h-4 w-4 animate-spin" />
+          <span>Preparing your test…</span>
+        </div>
+      </CardContent>
+    </Card>
+  );
 }

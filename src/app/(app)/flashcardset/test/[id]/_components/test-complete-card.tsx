@@ -1,3 +1,4 @@
+// Depends on the computed test-session summary that the engine produces at the end of the run.
 "use client";
 
 import {
@@ -9,13 +10,11 @@ import {
 } from "@/components/ui/card";
 import type { TestSessionSummary } from "../_lib/types";
 
-export function TestCompleteCard({
-  sessionId,
-  summary,
-}: {
-  sessionId: string;
+interface TestCompleteCardProps {
   summary: TestSessionSummary;
-}) {
+}
+
+export function TestCompleteCard({ summary }: TestCompleteCardProps) {
   const elapsedSeconds = Math.max(1, Math.round(summary.timeTakenMs / 1000));
   const minutes = Math.floor(elapsedSeconds / 60);
   const seconds = elapsedSeconds % 60;
@@ -25,11 +24,11 @@ export function TestCompleteCard({
       <CardHeader className="border-b bg-muted/20">
         <CardTitle className="text-2xl">Test complete</CardTitle>
         <CardDescription>
-          Session {sessionId} finished with {summary.correctCount} correct
-          answers out of {summary.totalQuestions}.
+          You answered {summary.correctCount} out of {summary.totalQuestions}{" "}
+          questions correctly.
         </CardDescription>
       </CardHeader>
-      <CardContent className="space-y-6 p-6">
+      <CardContent className="flex flex-col gap-6 p-6">
         <div className="grid gap-3 sm:grid-cols-3">
           <Metric label="Score" value={`${summary.scorePercent}%`} />
           <Metric
@@ -41,8 +40,7 @@ export function TestCompleteCard({
 
         <div className="rounded-xl border bg-background p-4">
           <p className="text-muted-foreground text-sm">
-            A detailed session log was written to the console, including each
-            question response and correctness flag.
+            Your score, timing, and per-question results are summarized above.
           </p>
         </div>
       </CardContent>

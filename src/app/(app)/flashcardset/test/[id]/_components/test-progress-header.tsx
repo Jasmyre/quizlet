@@ -1,3 +1,4 @@
+// Depends on shadcn Progress and Button chrome supplied by the test engine layout.
 "use client";
 
 import { Progress } from "@/components/ui/progress";

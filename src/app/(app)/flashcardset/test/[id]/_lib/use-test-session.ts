@@ -1,6 +1,7 @@
+// Depends on the question bank output and owns the mutable answer log for the engine UI.
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { isCorrectAnswer, scoreSession } from "./score-session";
 import type {
   TestAnswer,
@@ -14,6 +15,7 @@ import type {
 interface UseTestSessionOptions {
   config: TestConfig;
   questions: TestQuestion[];
+  shouldInstantResponse: (question: TestQuestion) => boolean;
 }
 
 interface CommitResult {
@@ -25,34 +27,63 @@ interface RevealState extends TestFeedback {
   questionId: string;
 }
 
-export function useTestSession({ config, questions }: UseTestSessionOptions) {
+export function useTestSession({
+  config,
+  questions,
+  shouldInstantResponse,
+}: UseTestSessionOptions) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [draftAnswersByQuestionId, setDraftAnswersByQuestionId] = useState<
     Record<string, TestAnswer | undefined>
   >({});
   const [committedResponsesByQuestionId, setCommittedResponsesByQuestionId] =
     useState<Record<string, TestResponseRecord>>({});
-  const [isComplete, setIsComplete] = useState(false);
   const [completedAt, setCompletedAt] = useState<number | null>(null);
+  const [isComplete, setIsComplete] = useState(false);
   const [revealState, setRevealState] = useState<RevealState | null>(null);
-  const startedAtRef = useRef(Date.now());
+  const startedAtRef = useRef<number | null>(null);
+  const questionsKeyRef = useRef<string>("");
+
+  useEffect(() => {
+    const nextQuestionsKey = questions.map((question) => question.id).join("|");
+
+    if (questionsKeyRef.current === nextQuestionsKey) {
+      return;
+    }
+
+    questionsKeyRef.current = nextQuestionsKey;
+    startedAtRef.current = null;
+    setCurrentIndex(0);
+    setDraftAnswersByQuestionId({});
+    setCommittedResponsesByQuestionId({});
+    setCompletedAt(null);
+    setIsComplete(false);
+    setRevealState(null);
+  }, [questions]);
+
+  useEffect(() => {
+    if (questions.length === 0 || startedAtRef.current !== null) {
+      return;
+    }
+
+    startedAtRef.current = Date.now();
+  }, [questions.length]);
 
   const currentQuestion = questions[currentIndex];
   const currentQuestionId = currentQuestion?.id;
+  const currentQuestionUsesInstantResponse = currentQuestion
+    ? shouldInstantResponse(currentQuestion)
+    : false;
   const currentDraftAnswer =
     currentQuestionId === undefined
       ? undefined
       : (draftAnswersByQuestionId[currentQuestionId] ??
         committedResponsesByQuestionId[currentQuestionId]?.userResponse);
-  const currentCommittedRecord =
-    currentQuestionId === undefined
-      ? undefined
-      : committedResponsesByQuestionId[currentQuestionId];
   const currentReveal =
     revealState?.questionId === currentQuestionId ? revealState : null;
   const isCurrentQuestionLocked =
     revealState?.questionId === currentQuestionId &&
-    config.instantResponse &&
+    currentQuestionUsesInstantResponse &&
     !isComplete;
 
   const setDraftAnswer = (questionId: string, value: TestAnswer): void => {
@@ -80,11 +111,11 @@ export function useTestSession({ config, questions }: UseTestSessionOptions) {
 
     const answeredAt = new Date().toISOString();
     const record: TestResponseRecord = {
+      answeredAt,
+      flashcardIds: currentQuestion.flashcardIds,
       questionId: currentQuestion.id,
-      flashcardId: currentQuestion.flashcardId,
       type: currentQuestion.type,
       userResponse: rawAnswer,
-      answeredAt,
     };
 
     setDraftAnswersByQuestionId((currentValue) => ({
@@ -97,12 +128,12 @@ export function useTestSession({ config, questions }: UseTestSessionOptions) {
     }));
 
     const feedback: TestFeedback = {
-      wasCorrect: isCorrectAnswer(currentQuestion, rawAnswer),
       correctAnswerText: currentQuestion.correctAnswerText,
       userResponse: rawAnswer,
+      wasCorrect: isCorrectAnswer(currentQuestion, rawAnswer),
     };
 
-    if (config.instantResponse) {
+    if (currentQuestionUsesInstantResponse) {
       setRevealState({
         ...feedback,
         questionId: currentQuestion.id,
@@ -142,9 +173,11 @@ export function useTestSession({ config, questions }: UseTestSessionOptions) {
   };
 
   const timeTakenMs =
-    completedAt === null
-      ? Date.now() - startedAtRef.current
-      : completedAt - startedAtRef.current;
+    startedAtRef.current === null
+      ? 0
+      : completedAt === null
+        ? Date.now() - startedAtRef.current
+        : completedAt - startedAtRef.current;
 
   const summary = useMemo<TestSessionSummary>(
     () =>
@@ -159,13 +192,10 @@ export function useTestSession({ config, questions }: UseTestSessionOptions) {
   return {
     clearReveal,
     commitCurrentAnswer,
-    completedAt,
-    currentCommittedRecord,
     currentDraftAnswer,
     currentIndex,
     currentQuestion,
     currentReveal,
-    draftAnswersByQuestionId,
     goNext,
     goPrevious,
     isComplete,
@@ -186,6 +216,18 @@ function isAnswerPresent(
 
   if (question.type === "true_false") {
     return typeof value === "boolean";
+  }
+
+  if (question.type === "matching") {
+    return (
+      typeof value === "object" &&
+      value !== null &&
+      question.slots.every((slot) => {
+        const assignment = value[slot.id];
+
+        return typeof assignment === "string" && assignment.trim().length > 0;
+      })
+    );
   }
 
   return typeof value === "string" && value.trim().length > 0;

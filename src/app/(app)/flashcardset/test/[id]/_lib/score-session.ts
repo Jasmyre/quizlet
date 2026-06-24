@@ -1,5 +1,7 @@
+// Depends on the question bank output and the test-session response log to compute the final score.
 import { normalizeAnswer } from "./normalize-answer";
 import type {
+  MatchingAssignments,
   TestQuestion,
   TestResponse,
   TestResponseRecord,
@@ -21,11 +23,7 @@ export function isCorrectAnswer(
           normalizeAnswer(question.correctAnswerText)
       );
     case "matching":
-      return (
-        typeof userResponse === "string" &&
-        normalizeAnswer(userResponse) ===
-          normalizeAnswer(String(question.correctAnswer))
-      );
+      return matchesAssignments(userResponse, question.correctAnswer);
     default:
       return false;
   }
@@ -46,13 +44,13 @@ export function scoreSession({
     const wasCorrect = record ? isCorrectAnswer(question, userResponse) : false;
 
     return {
+      answeredAt: record?.answeredAt ?? "",
+      correctAnswerText: question.correctAnswerText,
+      flashcardIds: record?.flashcardIds ?? question.flashcardIds,
       questionId: question.id,
-      flashcardId: question.flashcardId,
       type: question.type,
       userResponse,
       wasCorrect,
-      answeredAt: record?.answeredAt ?? "",
-      correctAnswerText: question.correctAnswerText,
     };
   });
 
@@ -65,10 +63,35 @@ export function scoreSession({
       : Math.round((correctCount / responses.length) * 100);
 
   return {
-    totalQuestions: questions.length,
     correctCount,
+    responses,
     scorePercent,
     timeTakenMs,
-    responses,
+    totalQuestions: questions.length,
   };
+}
+
+function matchesAssignments(
+  userResponse: TestResponseRecord["userResponse"],
+  correctAnswer: MatchingAssignments
+): boolean {
+  if (typeof userResponse !== "object" || userResponse === null) {
+    return false;
+  }
+
+  const responseEntries = Object.entries(userResponse);
+  const correctEntries = Object.entries(correctAnswer);
+
+  if (responseEntries.length !== correctEntries.length) {
+    return false;
+  }
+
+  return correctEntries.every(([slotId, answerId]) => {
+    const userAnswerId = (userResponse as MatchingAssignments)[slotId];
+
+    return (
+      typeof userAnswerId === "string" &&
+      normalizeAnswer(userAnswerId) === normalizeAnswer(answerId)
+    );
+  });
 }

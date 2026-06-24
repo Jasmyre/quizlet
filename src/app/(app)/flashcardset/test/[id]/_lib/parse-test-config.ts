@@ -1,4 +1,5 @@
-import type { AnswerWith, QuestionType, TestConfig } from "./types";
+// Depends on the page search params and produces the config consumed by the client test engine.
+import type { PromptMode, QuestionType, TestConfig } from "./types";
 
 const availableQuestionTypes = [
   "true_false",
@@ -14,21 +15,28 @@ export function parseTestConfig(
     getParam(searchParams, "questions") ?? "",
     12
   );
-  const answerWith = parseAnswerWith(getParam(searchParams, "answerWith"));
   const selectedQuestionTypes = availableQuestionTypes.filter((type) =>
     getBoolean(searchParams, typeToParamKey(type))
   );
 
   return {
+    allowBackNavigation: getBoolean(searchParams, "allowBackNavigation"),
+    instantResponse: getBoolean(searchParams, "instantResponse"),
+    promptMode: parsePromptMode(getParam(searchParams, "promptMode")),
     questionCount,
     selectedQuestionTypes:
       selectedQuestionTypes.length > 0
         ? selectedQuestionTypes
         : [...availableQuestionTypes],
-    instantResponse: getBoolean(searchParams, "instantResponse"),
-    allowBackNavigation: getBoolean(searchParams, "allowBackNavigation"),
-    answerWith,
   };
+}
+
+function parsePromptMode(value: string | undefined): PromptMode {
+  if (value === "term" || value === "definition" || value === "both") {
+    return value;
+  }
+
+  return "both";
 }
 
 function typeToParamKey(type: QuestionType): string {
@@ -44,10 +52,6 @@ function typeToParamKey(type: QuestionType): string {
     default:
       return "written";
   }
-}
-
-function parseAnswerWith(value: string | undefined): AnswerWith {
-  return value === "term" ? "term" : "definition";
 }
 
 function getParam(

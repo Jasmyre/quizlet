@@ -1,4 +1,4 @@
-import { shuffle } from "./shuffle";
+// Depends on the available test types and the shuffled deck order produced by the client engine.
 import type { QuestionType } from "./types";
 
 const defaultQuestionTypes = [
@@ -34,5 +34,5 @@ export function distributeQuestions(
     assignments.push(questionType);
   }
 
-  return shuffle(assignments);
+  return assignments;
 }

@@ -1,49 +1,87 @@
+// Depends on the test engine, question components, and scoring helpers that all share this flashcard test contract.
 export type QuestionType =
   | "true_false"
   | "multiple_choice"
   | "matching"
   | "written";
 
-export type AnswerWith = "term" | "definition";
+export type PromptMode = "term" | "definition" | "both";
 
-export type TestAnswer = boolean | string;
+export type MatchingAssignments = Record<string, string>;
+
+export type TestAnswer = boolean | string | MatchingAssignments;
 
 export interface Flashcard {
   definition: string;
-  hint?: string;
   id: string;
-  tags?: string[];
   term: string;
 }
 
 export interface TestConfig {
   allowBackNavigation: boolean;
-  answerWith: AnswerWith;
   instantResponse: boolean;
+  promptMode: PromptMode;
   questionCount: number;
   selectedQuestionTypes: QuestionType[];
 }
 
+export interface MatchingSlot {
+  answerId: string;
+  answerText: string;
+  id: string;
+  promptText: string;
+}
+
 export interface MatchingChoice {
-  key: string;
+  id: string;
   text: string;
 }
 
-export interface TestQuestion {
-  acceptedAnswers?: string[];
-  choices?: string[];
-  correctAnswer: TestAnswer;
-  correctAnswerText: string;
-  flashcardId: string;
+interface QuestionBase {
+  flashcardIds: string[];
+  headerText: string;
   id: string;
-  matchingChoices?: MatchingChoice[];
-  prompt: string;
-  type: QuestionType;
+  promptMode: PromptMode;
 }
+
+export interface TrueFalseQuestion extends QuestionBase {
+  correctAnswer: boolean;
+  correctAnswerText: string;
+  statementText: string;
+  type: "true_false";
+}
+
+export interface MultipleChoiceQuestion extends QuestionBase {
+  choices: string[];
+  correctAnswer: string;
+  correctAnswerText: string;
+  type: "multiple_choice";
+}
+
+export interface MatchingQuestion extends QuestionBase {
+  answerBank: MatchingChoice[];
+  correctAnswer: MatchingAssignments;
+  correctAnswerText: string;
+  slots: MatchingSlot[];
+  type: "matching";
+}
+
+export interface WrittenQuestion extends QuestionBase {
+  acceptedAnswers: string[];
+  correctAnswer: string;
+  correctAnswerText: string;
+  type: "written";
+}
+
+export type TestQuestion =
+  | TrueFalseQuestion
+  | MultipleChoiceQuestion
+  | MatchingQuestion
+  | WrittenQuestion;
 
 export interface TestResponseRecord {
   answeredAt: string;
-  flashcardId: string;
+  flashcardIds: string[];
   questionId: string;
   type: QuestionType;
   userResponse: TestAnswer;

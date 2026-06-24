@@ -1,3 +1,4 @@
+// Depends on the test engine's client-only mount effect to avoid server-side randomness.
 export function shuffle<T>(values: readonly T[]): T[] {
   const next = [...values];
 

@@ -1,3 +1,4 @@
+// Depends on the sidebar shell and the client-side test engine rendered inside the route content area.
 import { AppSidebar } from "@/components/app-sidebar";
 import MagicBackButton from "@/components/magic-back-button";
 import { Separator } from "@/components/ui/separator";
@@ -14,7 +15,7 @@ interface FlashcardSetTestPageProps {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }
 
-export default async function FlashcardSetTestPage({
+export async function FlashcardSetTestPage({
   params,
   searchParams,
 }: FlashcardSetTestPageProps) {
@@ -51,7 +52,7 @@ export default async function FlashcardSetTestPage({
 
           <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center py-4">
             <div className="flex w-full min-w-0 flex-col gap-8 px-4 pb-10">
-              <TestEngine flashcardSetId={id} searchParams={options} />
+              <TestEngine searchParams={options} />
             </div>
           </main>
         </SidebarInset>
@@ -59,3 +60,5 @@ export default async function FlashcardSetTestPage({
     </HydrateClient>
   );
 }
+
+export default FlashcardSetTestPage;

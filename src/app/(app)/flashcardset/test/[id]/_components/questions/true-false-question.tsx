@@ -1,3 +1,4 @@
+// Depends on the shared question shell and shadcn RadioGroup primitives for the binary choice input.
 "use client";
 
 import { Label } from "@/components/ui/label";
@@ -5,50 +6,51 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import type { TestAnswer, TestFeedback, TestQuestion } from "../../_lib/types";
 import { QuestionShell } from "../question-shell";
 
+interface TrueFalseQuestionProps {
+  feedback: TestFeedback | null;
+  isDisabled: boolean;
+  onChange: (value: TestAnswer) => void;
+  question: Extract<TestQuestion, { type: "true_false" }>;
+  value: TestAnswer | undefined;
+}
+
 export function TrueFalseQuestion({
   feedback,
   isDisabled,
   onChange,
-  questionIndex,
-  totalQuestions,
   question,
   value,
-}: {
-  feedback: TestFeedback | null;
-  isDisabled: boolean;
-  onChange: (value: TestAnswer) => void;
-  questionIndex: number;
-  totalQuestions: number;
-  question: TestQuestion;
-  value: TestAnswer | undefined;
-}) {
+}: TrueFalseQuestionProps) {
   const selectedValue =
     typeof value === "boolean" ? (value ? "true" : "false") : "";
 
   return (
-    <QuestionShell
-      feedback={feedback}
-      question={question}
-      questionIndex={questionIndex}
-      totalQuestions={totalQuestions}
-    >
-      <RadioGroup
-        className="grid gap-3 sm:grid-cols-2"
-        disabled={isDisabled}
-        onValueChange={(nextValue) => onChange(nextValue === "true")}
-        value={selectedValue}
-      >
-        <Choice
-          description="The statement is correct."
-          label="True"
-          value="true"
-        />
-        <Choice
-          description="The statement is not correct."
-          label="False"
-          value="false"
-        />
-      </RadioGroup>
+    <QuestionShell feedback={feedback} title={question.headerText}>
+      <div className="flex flex-col gap-4">
+        <p className="text-muted-foreground text-sm">
+          Choose whether the prompt is true or false.
+        </p>
+        <div className="rounded-xl border bg-background p-4">
+          <p className="text-sm leading-relaxed">{question.statementText}</p>
+        </div>
+        <RadioGroup
+          className="grid gap-3 sm:grid-cols-2"
+          disabled={isDisabled}
+          onValueChange={(nextValue) => onChange(nextValue === "true")}
+          value={selectedValue}
+        >
+          <Choice
+            description="The statement is correct."
+            label="True"
+            value="true"
+          />
+          <Choice
+            description="The statement is not correct."
+            label="False"
+            value="false"
+          />
+        </RadioGroup>
+      </div>
     </QuestionShell>
   );
 }

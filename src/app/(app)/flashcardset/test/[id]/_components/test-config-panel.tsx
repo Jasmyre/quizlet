@@ -1,3 +1,4 @@
+// Depends on the parsed test config and gives the engine a compact setup summary for the current session.
 "use client";
 
 import {
@@ -9,13 +10,15 @@ import {
 } from "@/components/ui/card";
 import type { TestConfig } from "../_lib/types";
 
+interface TestConfigPanelProps {
+  config: TestConfig;
+  questionCount: number;
+}
+
 export function TestConfigPanel({
   config,
   questionCount,
-}: {
-  config: TestConfig;
-  questionCount: number;
-}) {
+}: TestConfigPanelProps) {
   return (
     <Card className="border-dashed">
       <CardHeader>
@@ -26,8 +29,8 @@ export function TestConfigPanel({
         <dl className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
           <ConfigRow label="Questions" value={questionCount.toString()} />
           <ConfigRow
-            label="Answer with"
-            value={config.answerWith === "term" ? "Term" : "Definition"}
+            label="Prompt mode"
+            value={formatPromptMode(config.promptMode)}
           />
           <ConfigRow
             label="Instant response"
@@ -58,4 +61,16 @@ function ConfigRow({ label, value }: { label: string; value: string }) {
       <dd className="mt-1 text-sm">{value}</dd>
     </div>
   );
+}
+
+function formatPromptMode(promptMode: TestConfig["promptMode"]): string {
+  if (promptMode === "term") {
+    return "Term to definition";
+  }
+
+  if (promptMode === "definition") {
+    return "Definition to term";
+  }
+
+  return "Mixed term and definition";
 }

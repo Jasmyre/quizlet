@@ -28,7 +28,6 @@ import { MultipleChoiceQuestion } from "./questions/multiple-choice-question";
 import { TrueFalseQuestion } from "./questions/true-false-question";
 import { WrittenQuestion } from "./questions/written-question";
 import { TestCompleteCard } from "./test-complete-card";
-import { TestConfigPanel } from "./test-config-panel";
 import { TestProgressHeader } from "./test-progress-header";
 
 interface TestEngineProps {
@@ -222,11 +221,6 @@ export function TestEngine({ searchParams }: TestEngineProps) {
         progressValue={progressValue}
         questionIndex={currentIndex}
         totalQuestions={resolvedQuestions.length}
-      />
-
-      <TestConfigPanel
-        config={config}
-        questionCount={resolvedQuestions.length}
       />
 
       {renderQuestion({

@@ -38,7 +38,9 @@ export function buildQuestionBank({
   );
   const matchingBatchSize = Math.max(
     1,
-    Math.ceil(flashcards.length / Math.max(1, config.selectedQuestionTypes.length))
+    Math.ceil(
+      flashcards.length / Math.max(1, config.selectedQuestionTypes.length)
+    )
   );
 
   return questionTypes.map((type, index) => {

@@ -332,7 +332,7 @@ function CheckboxField({
 }) {
   return (
     <label
-      className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors has-checked:border-ring has-[:checked]:bg-muted/40"
+      className="flex cursor-pointer items-center gap-3 rounded-lg border p-3 transition-colors has-checked:border-ring has-checked:bg-muted/40"
       htmlFor={id}
     >
       <Checkbox

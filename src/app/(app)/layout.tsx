@@ -325,9 +325,7 @@ export default function RootLayout({
               disableTransitionOnChange
               enableSystem
             >
-              <TooltipProvider>
-                {children}
-              </TooltipProvider>
+              <TooltipProvider>{children}</TooltipProvider>
             </ThemeProvider>
           </SessionProvider>
         </TRPCReactProvider>

@@ -56,7 +56,9 @@ export default function UserPage({
                   className="mr-2 data-vertical:h-4 data-vertical:self-auto"
                   orientation="vertical"
                 />
-                <h1 className="font-semibold text-lg tracking-tight">Profile</h1>
+                <h1 className="font-semibold text-lg tracking-tight">
+                  Profile
+                </h1>
               </div>
               <MagicBackButton backLink={"/"} className="md:hidden" />
             </div>

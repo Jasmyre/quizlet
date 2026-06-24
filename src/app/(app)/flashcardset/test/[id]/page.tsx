@@ -1,5 +1,6 @@
-// Depends on the sidebar shell and the client-side test engine rendered inside the route content area.
+import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { auth } from "@/auth";
 import { AppSidebar } from "@/components/app-sidebar";
 import MagicBackButton from "@/components/magic-back-button";
 import { Separator } from "@/components/ui/separator";
@@ -8,6 +9,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar";
+import { getFlashcardSet } from "@/lib/flashcard-set";
 import { HydrateClient } from "@/trpc/server";
 import { TestEngine } from "./_components/test-engine";
 
@@ -38,13 +40,23 @@ export default function FlashcardSetTestPage({
   );
 }
 
-// 2. We move the runtime data access into this deeper child component.
 async function TestPageContent({
   params,
   searchParams,
 }: FlashcardSetTestPageProps) {
-  // Await the promises here, inside the Suspense boundary.
-  const [{ id }, options] = await Promise.all([params, searchParams]);
+  const [{ id }, options, session] = await Promise.all([
+    params,
+    searchParams,
+    auth(),
+  ]);
+  const flashcardSet = await getFlashcardSet({
+    id,
+    viewerUserId: session?.user?.id,
+  });
+
+  if (!flashcardSet) {
+    notFound();
+  }
 
   return (
     <>
@@ -74,7 +86,10 @@ async function TestPageContent({
 
       <main className="mx-auto flex w-full min-w-0 max-w-6xl justify-center py-4">
         <div className="flex w-full min-w-0 flex-col gap-8 px-4 pb-10">
-          <TestEngine searchParams={options} />
+          <TestEngine
+            flashcards={flashcardSet.flashcards}
+            searchParams={options}
+          />
         </div>
       </main>
     </>

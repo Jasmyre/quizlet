@@ -1,4 +1,4 @@
-// Depends on the mock deck, slide generator, config parser, and question components that power the flashcard test route.
+// Depends on the flashcard deck provided by the route, slide generator, config parser, and question components.
 "use client";
 
 import {
@@ -19,7 +19,6 @@ import {
 } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { mockFlashcards } from "../_data/mock-data";
 import {
   buildMatchingSlideQuestion,
   buildSlideQuestion,
@@ -46,10 +45,11 @@ import { TestCompleteCard } from "./test-complete-card";
 import { TestProgressHeader } from "./test-progress-header";
 
 interface TestEngineProps {
+  flashcards: Flashcard[];
   searchParams: Record<string, string | string[] | undefined>;
 }
 
-export function TestEngine({ searchParams }: TestEngineProps) {
+export function TestEngine({ flashcards, searchParams }: TestEngineProps) {
   const config = useMemo(() => parseTestConfig(searchParams), [searchParams]);
   const [isMounted, setIsMounted] = useState(false);
   const [slides, setSlides] = useState<TestSlide[] | null>(null);
@@ -65,22 +65,18 @@ export function TestEngine({ searchParams }: TestEngineProps) {
 
     setSlides(null);
     const nextSlides = generateTestSequence(
-      mockFlashcards,
+      flashcards,
       config.selectedQuestionTypes
     );
     setSlides(nextSlides);
-  }, [config.selectedQuestionTypes, isMounted]);
+  }, [config.selectedQuestionTypes, flashcards, isMounted]);
 
   if (!isMounted || slides === null) {
     return <LoadingSkeleton />;
   }
 
   return (
-    <TestEngineContent
-      allCards={mockFlashcards}
-      config={config}
-      slides={slides}
-    />
+    <TestEngineContent allCards={flashcards} config={config} slides={slides} />
   );
 }
 
@@ -259,22 +255,24 @@ function TestEngineContent({
     setCurrentIndex((currentValue) => Math.max(0, currentValue - 1));
   };
 
-  useEffect(() => {
-    scheduleAutoAdvance({
-      autoAdvanceTimerRef,
+  useEffect(
+    () =>
+      scheduleAutoAdvance({
+        autoAdvanceTimerRef,
+        clearReveal,
+        currentQuestion,
+        currentQuestionUsesInstantResponse,
+        currentReveal,
+        goNext,
+      }),
+    [
       clearReveal,
       currentQuestion,
       currentQuestionUsesInstantResponse,
       currentReveal,
       goNext,
-    });
-  }, [
-    clearReveal,
-    currentQuestion,
-    currentQuestionUsesInstantResponse,
-    currentReveal,
-    goNext,
-  ]);
+    ]
+  );
 
   if (slides.length === 0) {
     return (

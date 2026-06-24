@@ -101,11 +101,7 @@ export function FlashcardSetActions({
 
   const maxQuestions = flashcardSet.flashcards.length;
   const parsedQuestionCount = Number.parseInt(questionCount, 10);
-  const canStartTest =
-    maxQuestions > 0 &&
-    Number.isFinite(parsedQuestionCount) &&
-    parsedQuestionCount >= 1 &&
-    parsedQuestionCount <= maxQuestions;
+  const canStartTest = maxQuestions > 0;
 
   const handleStartTest = () => {
     if (!canStartTest) {
@@ -114,12 +110,24 @@ export function FlashcardSetActions({
 
     const searchParams = new URLSearchParams();
     searchParams.set("questions", parsedQuestionCount.toString());
-    searchParams.set("answerWith", answerWith);
-    searchParams.set("trueFalse", isTrueFalse.toString());
-    searchParams.set("multipleChoice", isMultipleChoice.toString());
-    searchParams.set("matching", isMatching.toString());
-    searchParams.set("written", isWritten.toString());
+    searchParams.set("promptMode", answerWith);
     searchParams.set("instantResponse", instantResponse.toString());
+
+    if (isTrueFalse) {
+      searchParams.append("question", "true_false");
+    }
+
+    if (isMultipleChoice) {
+      searchParams.append("question", "multiple_choice");
+    }
+
+    if (isMatching) {
+      searchParams.append("question", "matching");
+    }
+
+    if (isWritten) {
+      searchParams.append("question", "written");
+    }
 
     router.push(
       `/flashcardset/test/${encodeURIComponent(flashcardSet.id)}?${searchParams.toString()}`

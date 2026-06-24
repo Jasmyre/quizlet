@@ -15,9 +15,7 @@ export function parseTestConfig(
     getParam(searchParams, "questions") ?? "",
     12
   );
-  const selectedQuestionTypes = availableQuestionTypes.filter((type) =>
-    getBoolean(searchParams, typeToParamKey(type))
-  );
+  const selectedQuestionTypes = parseSelectedQuestionTypes(searchParams);
 
   return {
     allowBackNavigation: getBoolean(searchParams, "allowBackNavigation"),
@@ -29,6 +27,30 @@ export function parseTestConfig(
         ? selectedQuestionTypes
         : [...availableQuestionTypes],
   };
+}
+
+function parseSelectedQuestionTypes(
+  searchParams: Record<string, string | string[] | undefined>
+): QuestionType[] {
+  const questionParams = getParamValues(searchParams, "question");
+  const selectedFromQuestionParams = questionParams
+    .flatMap((value) => value.split(","))
+    .map((value) => parseQuestionType(value.trim()))
+    .filter((value): value is QuestionType => value !== null);
+
+  if (selectedFromQuestionParams.length > 0) {
+    return Array.from(new Set(selectedFromQuestionParams));
+  }
+
+  const selectedFromLegacyFlags = availableQuestionTypes.filter((type) =>
+    getBoolean(searchParams, typeToParamKey(type))
+  );
+
+  if (selectedFromLegacyFlags.length > 0) {
+    return selectedFromLegacyFlags;
+  }
+
+  return [...availableQuestionTypes];
 }
 
 function parsePromptMode(value: string | undefined): PromptMode {
@@ -65,6 +87,36 @@ function getParam(
   }
 
   return value;
+}
+
+function getParamValues(
+  searchParams: Record<string, string | string[] | undefined>,
+  key: string
+): string[] {
+  const value = searchParams[key];
+
+  if (Array.isArray(value)) {
+    return value;
+  }
+
+  return value === undefined ? [] : [value];
+}
+
+function parseQuestionType(value: string): QuestionType | null {
+  switch (value) {
+    case "true_false":
+    case "trueFalse":
+      return "true_false";
+    case "multiple_choice":
+    case "multipleChoice":
+      return "multiple_choice";
+    case "matching":
+      return "matching";
+    case "written":
+      return "written";
+    default:
+      return null;
+  }
 }
 
 function getBoolean(

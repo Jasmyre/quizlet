@@ -221,9 +221,15 @@ function ProfileHeader({ profile }: { profile: UserProfile }) {
       <div className="flex flex-col gap-5">
         <div className="flex w-full min-w-0 flex-col justify-between gap-4 md:flex-row">
           <div className="flex min-w-0 flex-row items-start gap-5 max-md:flex-col md:items-center">
-            <Avatar className="size-32" size="default">
-              <AvatarImage alt={profile.name} src={profile.avatarUrl} />
-              <AvatarFallback>{getInitials(profile.name)}</AvatarFallback>
+            <Avatar className="size-32 after:rounded-2xl" size="default">
+              <AvatarImage
+                alt={profile.name}
+                className="rounded-2xl"
+                src={profile.avatarUrl}
+              />
+              <AvatarFallback className="rounded-2xl">
+                {getInitials(profile.name)}
+              </AvatarFallback>
             </Avatar>
 
             <div className="min-w-0">

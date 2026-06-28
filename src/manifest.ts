@@ -7,9 +7,9 @@ export default function manifest(): MetadataRoute.Manifest {
     description:
       "Create and share flashcards with ease using Quizlet, the ultimate study tool.",
     start_url: "/",
-    display: "standalone",
-    background_color: "#f0f0f0",
-    theme_color: "#2d3639",
+    display: "fullscreen",
+    background_color: "#121212",
+    theme_color: "##121212",
     icons: [
       {
         src: "/icon-192x192.png",
